@@ -19,21 +19,21 @@ jobs:
           fetch-depth: 0
 
       - name: Azure login
-        uses: azure/login@v1
+        uses: azure/login@v2
         with:
           client-id: ${{ secrets.AZURE_CLIENT_ID }}
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
       - name: Show subscription details
-        uses: azure/CLI@v1
+        uses: azure/CLI@v2
         with:
           azcliversion: latest
           inlineScript: |
             az account show
 
       - name: Deploy infrastructure
-        uses: azure/arm-deploy@v1
+        uses: azure/arm-deploy@v2
         with:
           scope: subscription
           region: westeurope
@@ -53,9 +53,12 @@ jobs:
         with:
           push: true
           tags: ${{ secrets.REGISTRY_NAME }}.azurecr.io/cms:latest
+          file: ./Dockerfile.prod
+          build-args: |
+            NODE_ENV=production
 
-      - name: Deploy website
-        uses: azure/arm-deploy@v1
+      - name: Deploy cms
+        uses: azure/arm-deploy@v2
         with:
           scope: subscription
           region: westeurope
@@ -73,21 +76,21 @@ jobs:
           fetch-depth: 0
 
       - name: Azure login
-        uses: azure/login@v1
+        uses: azure/login@v2
         with:
           client-id: ${{ secrets.AZURE_CLIENT_ID }}
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
       - name: Show subscription details
-        uses: azure/CLI@v1
+        uses: azure/CLI@v2
         with:
           azcliversion: latest
           inlineScript: |
             az account show
 
       - name: Deploy infrastructure
-        uses: azure/arm-deploy@v1
+        uses: azure/arm-deploy@v2
         with:
           scope: subscription
           region: westeurope
@@ -95,8 +98,8 @@ jobs:
           template: ./deploy/infrastructure.bicep
           failOnStdErr: false
 
-      - name: Deploy website
-        uses: azure/arm-deploy@v1
+      - name: Deploy cms
+        uses: azure/arm-deploy@v2
         with:
           scope: subscription
           region: westeurope
