@@ -76,9 +76,12 @@ jobs:
         with:
           slug-maxlength: 11
 
-      - name: Remove container app
+      - name: Remove container app and related resources
         uses: azure/CLI@v2
         with:
           azcliversion: latest
           inlineScript: |
+            az containerapp update --name ctap-xprtzbv-cms-${{ env.GITHUB_REF_NAME_SLUG }} --unbind psql-xprtzbv-cms-${{ env.GITHUB_REF_NAME_SLUG }} -y
             az containerapp delete -g rg-xprtzbv-website -n ctap-xprtzbv-cms-${{ env.GITHUB_REF_NAME_SLUG }} -y
+            az containerapp delete -g rg-xprtzbv-website -n psql-xprtzbv-cms-${{ env.GITHUB_REF_NAME_SLUG }} -y
+            az acr repository delete --name ${{ secrets.REGISTRY_NAME }} --image cms:${{ env.GITHUB_REF_NAME_SLUG }} -y
