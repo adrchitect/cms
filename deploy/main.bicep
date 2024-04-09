@@ -6,7 +6,6 @@ param imageTag string = 'latest'
 var resourceGroupName = 'rg-xprtzbv-website'
 var containerAppIdentityName = 'id-xprtzbv-website'
 var frontDoorEndpointName = 'fde-xprtzbv-cms'
-var logAnalyticsWorkspaceName = 'log-xprtzbv-website'
 var keyVaultName = 'kv-xprtzbv-cms'
 
 resource resourceGroup 'Microsoft.Resources/resourceGroups@2021-04-01' existing = {
@@ -36,12 +35,11 @@ module containerAppCms 'modules/container-app-cms.bicep' = {
     keyVaultName: keyVaultName
     containerAppUserAssignedIdentityResourceId: containerAppIdentity.id
     containerAppUserAssignedIdentityClientId: containerAppIdentity.properties.clientId
-    logAnalyticsWorkspaceName: logAnalyticsWorkspaceName
     imageTag: imageTag
   }
 }
 
-module frontDoor 'modules/front-door.bicep' = {
+module frontDoor 'modules/front-door.bicep' = if (imageTag == 'latest') {
   scope: resourceGroup
   name: 'Deploy-Front-Door'
   params: {

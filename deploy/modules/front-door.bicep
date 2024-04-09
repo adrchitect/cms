@@ -13,20 +13,6 @@ var frontDoorRouteName = 'xpzrtbv-cms-route'
 var customDomainWwwName = 'cms-xprtz-dev'
 var cnameRecordName = 'cms'
 
-module dns 'dns.bicep' = {
-  name: 'Deploy-DNS-Records'
-  scope: resourceGroup(subscriptionId, 'xprtz-mgmt')
-  params: {
-    frontDoorEndpointHostName: frontDoorEndpoint.properties.hostName
-    cnameRecordName: cnameRecordName
-    cnameValidation: customDomainWww.properties.validationProperties.validationToken
-  }
-}
-
-resource frontDoorProfile 'Microsoft.Cdn/profiles@2023-07-01-preview' existing = {
-  name: frontDoorProfileName
-}
-
 resource customDomainWww 'Microsoft.Cdn/profiles/customDomains@2023-07-01-preview' = {
   name: customDomainWwwName
   parent: frontDoorProfile
@@ -40,6 +26,20 @@ resource customDomainWww 'Microsoft.Cdn/profiles/customDomains@2023-07-01-previe
       minimumTlsVersion: 'TLS12'
     }
   }
+}
+
+module dns 'dns.bicep' = {
+  name: 'Deploy-DNS-Records'
+  scope: resourceGroup(subscriptionId, 'xprtz-mgmt')
+  params: {
+    frontDoorEndpointHostName: frontDoorEndpoint.properties.hostName
+    cnameRecordName: cnameRecordName
+    cnameValidation: customDomainWww.properties.validationProperties.validationToken
+  }
+}
+
+resource frontDoorProfile 'Microsoft.Cdn/profiles@2023-07-01-preview' existing = {
+  name: frontDoorProfileName
 }
 
 resource frontDoorEndpoint 'Microsoft.Cdn/profiles/afdEndpoints@2023-07-01-preview' = {

@@ -25,18 +25,4 @@ resource containerAppEnvironment 'Microsoft.App/managedEnvironments@2022-11-01-p
   }
 }
 
-resource postgres 'Microsoft.App/containerApps@2023-04-01-preview' = {
-  name: 'pgsql-xprtzbv-cms'
-  location: location
-  properties: {
-    environmentId: containerAppEnvironment.id
-    configuration: {
-      service: {
-        type: 'postgres'
-      }
-    }
-  }
-}
-
 output containerAppEnvironmentId string = containerAppEnvironment.id
-output postgresId string = postgres.id

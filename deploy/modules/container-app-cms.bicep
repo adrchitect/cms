@@ -2,19 +2,31 @@ param location string
 param keyVaultName string
 param containerAppUserAssignedIdentityResourceId string
 param containerAppUserAssignedIdentityClientId string
-param logAnalyticsWorkspaceName string
 param imageTag string = 'latest'
 
 var name = take('ctap-xprtzbv-cms-${imageTag}', 32)
-
+var dbName = take('psql-xprtzbv-cms-${imageTag}', 32)
 var acrServer = 'xprtzbv.azurecr.io'
 var imageName = '${acrServer}/cms:${imageTag}'
 
-module containerAppEnvironment 'container-app-environment.bicep' = {
-  name: 'Deploy-Container-App-Environment'
-  params: {
-    location: location
-    logAnalyticsWorkspaceName: logAnalyticsWorkspaceName
+resource keyVault 'Microsoft.KeyVault/vaults@2022-07-01' existing = {
+  name: keyVaultName
+}
+
+resource containerAppEnvironment 'Microsoft.App/managedEnvironments@2022-11-01-preview' existing = {
+  name: 'me-xprtzbv-website'
+}
+
+resource postgres 'Microsoft.App/containerApps@2023-04-01-preview' = {
+  name: dbName
+  location: location
+  properties: {
+    environmentId: containerAppEnvironment.id
+    configuration: {
+      service: {
+        type: 'postgres'
+      }
+    }
   }
 }
 
@@ -28,7 +40,7 @@ resource containerApp 'Microsoft.App/containerApps@2023-08-01-preview' = {
     }
   }
   properties: {
-    environmentId: containerAppEnvironment.outputs.containerAppEnvironmentId
+    environmentId: containerAppEnvironment.id
     configuration: {
       registries: [
         {
@@ -43,27 +55,27 @@ resource containerApp 'Microsoft.App/containerApps@2023-08-01-preview' = {
       secrets: [
         {
           name: toLower('REF-APP-KEYS')
-          keyVaultUrl: toLower('https://kv-xprtzbv-cms.vault.azure.net/secrets/APP-KEYS')
+          keyVaultUrl: toLower('${keyVault.properties.vaultUri}secrets/APP-KEYS')
           identity: containerAppUserAssignedIdentityResourceId
         }
         {
           name: toLower('REF-API-TOKEN-SALT')
-          keyVaultUrl: toLower('https://kv-xprtzbv-cms.vault.azure.net/secrets/API-TOKEN-SALT')
+          keyVaultUrl: toLower('${keyVault.properties.vaultUri}secrets/API-TOKEN-SALT')
           identity: containerAppUserAssignedIdentityResourceId
         }
         {
           name: toLower('REF-ADMIN-JWT-SECRET')
-          keyVaultUrl: toLower('https://kv-xprtzbv-cms.vault.azure.net/secrets/ADMIN-JWT-SECRET')
+          keyVaultUrl: toLower('${keyVault.properties.vaultUri}secrets/ADMIN-JWT-SECRET')
           identity: containerAppUserAssignedIdentityResourceId
         }
         {
           name: toLower('REF-TRANSFER-TOKEN-SALT')
-          keyVaultUrl: toLower('https://kv-xprtzbv-cms.vault.azure.net/secrets/TRANSFER-TOKEN-SALT')
+          keyVaultUrl: toLower('${keyVault.properties.vaultUri}secrets/TRANSFER-TOKEN-SALT')
           identity: containerAppUserAssignedIdentityResourceId
         }
         {
           name: toLower('REF-JWT-SECRET')
-          keyVaultUrl: toLower('https://kv-xprtzbv-cms.vault.azure.net/secrets/JWT-SECRET')
+          keyVaultUrl: toLower('${keyVault.properties.vaultUri}secrets/JWT-SECRET')
           identity: containerAppUserAssignedIdentityResourceId
         }
       ]
@@ -71,7 +83,7 @@ resource containerApp 'Microsoft.App/containerApps@2023-08-01-preview' = {
     template: {
       serviceBinds: [
         {
-          serviceId: containerAppEnvironment.outputs.postgresId
+          serviceId: postgres.id
         }
       ]
       containers: [
@@ -119,8 +131,8 @@ resource containerApp 'Microsoft.App/containerApps@2023-08-01-preview' = {
         }
       ]
       scale: {
-       minReplicas: 1
-       maxReplicas: 1
+        minReplicas: 1
+        maxReplicas: 1
       }
     }
   }
