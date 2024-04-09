@@ -64,6 +64,11 @@ jobs:
     name: Remove container app
     if: github.event.action == 'closed'
     steps:
+      - name: Inject slug/short variables
+        uses: rlespinasse/github-slug-action@v4
+        with:
+          slug-maxlength: 11
+
       - name: Azure login
         uses: azure/login@v2
         with:
@@ -71,10 +76,12 @@ jobs:
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
-      - name: Inject slug/short variables
-        uses: rlespinasse/github-slug-action@v4
-        with:
-          slug-maxlength: 11
+      - name: "Login to ACR"
+        run: |
+          set -euo pipefail
+          access_token=$(az account get-access-token --query accessToken -o tsv)
+          refresh_token=$(curl https://${{ secrets.REGISTRY_NAME }}.azurecr.io/oauth2/exchange -v -d "grant_type=access_token&service=${{ secrets.REGISTRY_NAME }}.azurecr.io&access_token=$access_token" | jq -r .refresh_token)
+          docker login -u 00000000-0000-0000-0000-000000000000 --password-stdin ${{ secrets.REGISTRY_NAME }}.azurecr.io <<< "$refresh_token"
 
       - name: Remove container app and related resources
         uses: azure/CLI@v2
