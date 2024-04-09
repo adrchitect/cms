@@ -76,13 +76,6 @@ jobs:
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
-      - name: "Login to ACR"
-        run: |
-          set -euo pipefail
-          access_token=$(az account get-access-token --query accessToken -o tsv)
-          refresh_token=$(curl https://${{ secrets.REGISTRY_NAME }}.azurecr.io/oauth2/exchange -v -d "grant_type=access_token&service=${{ secrets.REGISTRY_NAME }}.azurecr.io&access_token=$access_token" | jq -r .refresh_token)
-          docker login -u 00000000-0000-0000-0000-000000000000 --password-stdin ${{ secrets.REGISTRY_NAME }}.azurecr.io <<< "$refresh_token"
-
       - name: Remove container app and related resources
         uses: azure/CLI@v2
         with:
@@ -90,4 +83,3 @@ jobs:
           inlineScript: |
             az containerapp delete -g rg-xprtzbv-website -n ctap-xprtzbv-cms-${{ env.GITHUB_REF_NAME_SLUG }} -y
             az containerapp delete -g rg-xprtzbv-website -n psql-xprtzbv-cms-${{ env.GITHUB_REF_NAME_SLUG }} -y
-            az acr repository delete --name ${{ secrets.REGISTRY_NAME }} --image cms:${{ env.GITHUB_REF_NAME_SLUG }} -y
