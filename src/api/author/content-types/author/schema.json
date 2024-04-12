@@ -10,60 +10,36 @@
   "options": {
     "draftAndPublish": true
   },
-  "pluginOptions": {
-    "i18n": {
-      "localized": true
-    }
-  },
+  "pluginOptions": {},
   "attributes": {
-    "Firstname": {
-      "pluginOptions": {
-        "i18n": {
-          "localized": true
-        }
-      },
+    "firstname": {
+      "pluginOptions": {},
       "type": "string",
       "required": true,
       "minLength": 3
     },
-    "Lastname": {
-      "pluginOptions": {
-        "i18n": {
-          "localized": true
-        }
-      },
+    "lastname": {
+      "pluginOptions": {},
       "type": "string",
       "minLength": 3,
       "required": true
     },
-    "Email": {
-      "pluginOptions": {
-        "i18n": {
-          "localized": true
-        }
-      },
+    "email": {
+      "pluginOptions": {},
       "type": "email",
       "required": true,
       "unique": false,
       "minLength": 3
     },
-    "Bio": {
-      "pluginOptions": {
-        "i18n": {
-          "localized": true
-        }
-      },
-      "type": "blocks"
-    },
-    "GitHub": {
-      "pluginOptions": {
-        "i18n": {
-          "localized": true
-        }
-      },
+    "gitHub": {
+      "pluginOptions": {},
       "type": "string",
       "minLength": 3,
       "unique": false
+    },
+    "biography": {
+      "pluginOptions": {},
+      "type": "text"
     }
   }
 }
