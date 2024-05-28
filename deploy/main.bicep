@@ -57,5 +57,6 @@ module postgreSQL 'modules/postgresql.bicep' = {
     resourceName: postgreSql
     // location: location
     cmsUami: containerAppIdentity.properties.principalId
+    cmsUamiName: containerAppIdentity.name
   }
 }

@@ -1,6 +1,7 @@
 param resourceName string
 // param location string
 param cmsUami string
+param cmsUamiName string
 
 resource postgreSql 'Microsoft.DBforPostgreSQL/flexibleServers@2023-12-01-preview' = {
   name: resourceName
@@ -29,6 +30,7 @@ resource postgreSql 'Microsoft.DBforPostgreSQL/flexibleServers@2023-12-01-previe
     properties: {
       tenantId: tenant().tenantId
       principalType: 'ServicePrincipal'
+      principalName: cmsUamiName
     }
   }
 }
