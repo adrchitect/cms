@@ -1,5 +1,5 @@
 param resourceName string
-param location string
+// param location string
 param cmsUami string
 
 resource postgreSql 'Microsoft.DBforPostgreSQL/flexibleServers@2023-12-01-preview' = {
