@@ -7,7 +7,7 @@ var resourceGroupName = 'rg-xprtzbv-website'
 var containerAppIdentityName = 'id-xprtzbv-website'
 var frontDoorEndpointName = 'fde-xprtzbv-cms'
 var keyVaultName = 'kv-xprtzbv-cms'
-var postgreSql = 'psql-xprtzbv-cms3'
+var postgreSql = 'psql-xprtzbv-cms4'
 
 resource resourceGroup 'Microsoft.Resources/resourceGroups@2021-04-01' existing = {
   name: resourceGroupName
