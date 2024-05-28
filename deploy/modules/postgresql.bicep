@@ -4,7 +4,7 @@ param cmsUami string
 
 resource postgreSql 'Microsoft.DBforPostgreSQL/flexibleServers@2023-12-01-preview' = {
   name: resourceName
-  location: location
+  location: 'germanywestcentral'
   sku: {
     name: 'Standard_B1ms'
     tier: 'Burstable'

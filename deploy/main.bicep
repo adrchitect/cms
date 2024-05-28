@@ -52,7 +52,7 @@ module frontDoor 'modules/front-door.bicep' = if (imageTag == 'latest') {
 
 module postgreSQL 'modules/postgresql.bicep' = {
   scope: resourceGroup
-  name: 'PostgreSQL'
+  name: 'Deploy-PostgreSQL'
   params: {
     resourceName: postgreSql
     location: location
