@@ -11,6 +11,7 @@ resource postgreSql 'Microsoft.DBforPostgreSQL/flexibleServers@2023-12-01-previe
   }
   properties: {
     createMode: 'Default'
+    version: '16'
     storage: {
       storageSizeGB: 32
       type: 'PremiumV2_LRS'
