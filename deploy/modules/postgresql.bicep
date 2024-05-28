@@ -18,6 +18,7 @@ resource postgreSql 'Microsoft.DBforPostgreSQL/flexibleServers@2023-12-01-previe
       iops: 3000
       throughput: 125
     }
+    administratorLogin: ''
   }
 
   resource administrators 'administrators' = {
