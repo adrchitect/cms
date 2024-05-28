@@ -2,10 +2,10 @@ param location string
 param keyVaultName string
 param containerAppUserAssignedIdentityResourceId string
 param containerAppUserAssignedIdentityClientId string
+param postgresDbUri string
 param imageTag string = 'latest'
 
 var name = take('ctap-xprtzbv-cms-${imageTag}', 32)
-var dbName = take('psql-xprtzbv-cms-${imageTag}', 32)
 var acrServer = 'xprtzbv.azurecr.io'
 var imageName = '${acrServer}/cms:${imageTag}'
 
@@ -15,19 +15,6 @@ resource keyVault 'Microsoft.KeyVault/vaults@2022-07-01' existing = {
 
 resource containerAppEnvironment 'Microsoft.App/managedEnvironments@2022-11-01-preview' existing = {
   name: 'me-xprtzbv-website'
-}
-
-resource postgres 'Microsoft.App/containerApps@2023-04-01-preview' = {
-  name: dbName
-  location: location
-  properties: {
-    environmentId: containerAppEnvironment.id
-    configuration: {
-      service: {
-        type: 'postgres'
-      }
-    }
-  }
 }
 
 resource containerApp 'Microsoft.App/containerApps@2023-08-01-preview' = {
@@ -81,11 +68,6 @@ resource containerApp 'Microsoft.App/containerApps@2023-08-01-preview' = {
       ]
     }
     template: {
-      serviceBinds: [
-        {
-          serviceId: postgres.id
-        }
-      ]
       containers: [
         {
           name: name
@@ -126,6 +108,10 @@ resource containerApp 'Microsoft.App/containerApps@2023-08-01-preview' = {
             {
               name: 'JWT_SECRET'
               secretRef: toLower('REF-JWT-SECRET')
+            }
+            {
+              name: postgresDbUri
+              value: postgresDbUri
             }
           ]
         }
