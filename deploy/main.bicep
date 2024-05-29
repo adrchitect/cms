@@ -32,7 +32,7 @@ module containerAppCms 'modules/container-app-cms.bicep' = {
   scope: resourceGroup
   name: 'Deploy-Container-App-Cms'
   params: {
-    // location: location
+    location: location
     keyVaultName: keyVaultName
     containerAppUserAssignedIdentityResourceId: containerAppIdentity.id
     containerAppUserAssignedIdentityClientId: containerAppIdentity.properties.clientId
