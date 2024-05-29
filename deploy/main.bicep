@@ -5,9 +5,9 @@ param imageTag string = 'latest'
 
 var resourceGroupName = 'rg-xprtzbv-website'
 var containerAppIdentityName = 'id-xprtzbv-website'
-var frontDoorEndpointName = 'fde-xprtzbv-cms'
+// var frontDoorEndpointName = 'fde-xprtzbv-cms'
 var keyVaultName = 'kv-xprtzbv-cms'
-var postgreSqlName = 'psql-xprtzbv-cms4'
+// var postgreSqlName = 'psql-xprtzbv-cms4'
 
 resource resourceGroup 'Microsoft.Resources/resourceGroups@2021-04-01' existing = {
   name: resourceGroupName
@@ -37,26 +37,26 @@ module containerAppCms 'modules/container-app-cms.bicep' = {
     containerAppUserAssignedIdentityResourceId: containerAppIdentity.id
     containerAppUserAssignedIdentityClientId: containerAppIdentity.properties.clientId
     imageTag: imageTag
-    postgresDbUri: postgreSQL.outputs.databaseUri
+    postgresDbUri: 'psql-xprtzbv-cms4.postgres.database.azure.com'
   }
 }
 
-module frontDoor 'modules/front-door.bicep' = if (imageTag == 'latest') {
-  scope: resourceGroup
-  name: 'Deploy-Front-Door'
-  params: {
-    frontDoorEndpointName: frontDoorEndpointName
-    originHostname: containerAppCms.outputs.containerAppUrl
-  }
-}
+// module frontDoor 'modules/front-door.bicep' = if (imageTag == 'latest') {
+//   scope: resourceGroup
+//   name: 'Deploy-Front-Door'
+//   params: {
+//     frontDoorEndpointName: frontDoorEndpointName
+//     originHostname: containerAppCms.outputs.containerAppUrl
+//   }
+// }
 
-module postgreSQL 'modules/postgresql.bicep' = {
-  scope: resourceGroup
-  name: 'Deploy-PostgreSQL'
-  params: {
-    resourceName: postgreSqlName
-    // location: location
-    cmsUami: containerAppIdentity.properties.principalId
-    cmsUamiName: containerAppIdentity.name
-  }
-}
+// module postgreSQL 'modules/postgresql.bicep' = {
+//   scope: resourceGroup
+//   name: 'Deploy-PostgreSQL'
+//   params: {
+//     resourceName: postgreSqlName
+//     // location: location
+//     cmsUami: containerAppIdentity.properties.principalId
+//     cmsUamiName: containerAppIdentity.name
+//   }
+// }
