@@ -1,4 +1,3 @@
-param location string
 param keyVaultName string
 param containerAppUserAssignedIdentityResourceId string
 param containerAppUserAssignedIdentityClientId string
@@ -19,7 +18,7 @@ resource containerAppEnvironment 'Microsoft.App/managedEnvironments@2022-11-01-p
 
 resource containerApp 'Microsoft.App/containerApps@2023-08-01-preview' = {
   name: name
-  location: location
+  location: 'eastus'
   identity: {
     type: 'UserAssigned'
     userAssignedIdentities: {

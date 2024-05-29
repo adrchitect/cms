@@ -32,14 +32,14 @@ jobs:
           inlineScript: |
             az account show
 
-      - name: Deploy infrastructure
-        uses: azure/arm-deploy@v2
-        with:
-          scope: subscription
-          region: westeurope
-          subscriptionId: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-          template: ./deploy/infrastructure.bicep
-          failOnStdErr: false
+      # - name: Deploy infrastructure
+      #   uses: azure/arm-deploy@v2
+      #   with:
+      #     scope: subscription
+      #     region: westeurope
+      #     subscriptionId: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+      #     template: ./deploy/infrastructure.bicep
+      #     failOnStdErr: false
 
       - name: "Login to ACR"
         run: |
