@@ -3,7 +3,7 @@ param containerAppUserAssignedIdentityResourceId string
 param containerAppUserAssignedIdentityClientId string
 param postgresDbUri string
 param imageTag string = 'latest'
-param location string
+// param location string
 
 var name = take('ctap-xprtzbv-cms-${imageTag}', 32)
 var acrServer = 'xprtzbv.azurecr.io'
@@ -19,7 +19,7 @@ resource containerAppEnvironment 'Microsoft.App/managedEnvironments@2022-11-01-p
 
 resource containerApp 'Microsoft.App/containerApps@2023-08-01-preview' = {
   name: name
-  location: location
+  location: 'germanywestcentral'
   identity: {
     type: 'UserAssigned'
     userAssignedIdentities: {
