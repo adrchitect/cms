@@ -1,8 +1,8 @@
-param location string
+// param location string
 
 resource vnet 'Microsoft.Network/virtualNetworks@2023-11-01' = {
   name: 'vnet-xprtzbv-cms'
-  location: location
+  location: 'germanywestcentral'
   properties: {
     addressSpace: {
       addressPrefixes: ['10.0.0.0/16']

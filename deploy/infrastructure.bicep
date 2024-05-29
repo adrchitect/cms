@@ -34,7 +34,7 @@ module vnet 'modules/vnet-cms.bicep' = {
   scope: resourceGroup
   name: 'Deploy-vnet-cms'
   params: {
-    location: location
+    // location: location
   }
 }
 
