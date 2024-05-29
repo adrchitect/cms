@@ -14,7 +14,7 @@ resource logAnalyticsWorkspace 'Microsoft.OperationalInsights/workspaces@2020-08
 
 resource containerAppEnvironment 'Microsoft.App/managedEnvironments@2024-03-01' = {
   name: 'me-xprtzbv-website'
-  location: location
+  location: 'eastus'
   properties: {
     appLogsConfiguration: {
       destination: 'log-analytics'
