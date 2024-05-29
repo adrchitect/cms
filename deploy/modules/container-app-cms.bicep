@@ -110,8 +110,28 @@ resource containerApp 'Microsoft.App/containerApps@2023-08-01-preview' = {
               secretRef: toLower('REF-JWT-SECRET')
             }
             {
-              name: postgresDbUri
+              name: 'DATABASE_CLIENT'
+              value: 'postgres'
+            }
+            {
+              name: 'DATABASE_HOST'
               value: postgresDbUri
+            }
+            {
+              name: 'DATABASE_NAME'
+              value: 'postgres'
+            }
+            {
+              name: 'DATABASE_PORT'
+              value: '5432'
+            }
+            {
+              name: 'DATABASE_USERNAME'
+              value: 'MyUser'
+            }
+            {
+              name: 'DATABASE_PASSWORD'
+              value: 'SuperSecretPassword11!!'
             }
           ]
         }
