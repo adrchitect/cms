@@ -1,5 +1,6 @@
 param location string
 param logAnalyticsWorkspaceName string
+param subnetId string
 
 resource logAnalyticsWorkspace 'Microsoft.OperationalInsights/workspaces@2020-08-01' = {
   name: logAnalyticsWorkspaceName
@@ -11,7 +12,7 @@ resource logAnalyticsWorkspace 'Microsoft.OperationalInsights/workspaces@2020-08
   }
 }
 
-resource containerAppEnvironment 'Microsoft.App/managedEnvironments@2022-11-01-preview' = {
+resource containerAppEnvironment 'Microsoft.App/managedEnvironments@2024-03-01' = {
   name: 'me-xprtzbv-website'
   location: location
   properties: {
@@ -22,6 +23,11 @@ resource containerAppEnvironment 'Microsoft.App/managedEnvironments@2022-11-01-p
         sharedKey: logAnalyticsWorkspace.listKeys().primarySharedKey
       }
     }
+    vnetConfiguration:{
+      internal: true
+      infrastructureSubnetId: subnetId
+    }
+
   }
 }
 

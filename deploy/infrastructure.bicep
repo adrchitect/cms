@@ -30,12 +30,21 @@ module acrAndRoleAssignment 'modules/roleassignments.bicep' = {
   }
 }
 
+module vnet 'modules/vnet-cms.bicep' = {
+  scope: resourceGroup
+  name: 'Deploy-vnet-cms'
+  params: {
+    location: location
+  }
+}
+
 module containerAppEnvironment 'modules/container-app-environment.bicep' = {
   scope: resourceGroup
   name: 'Deploy-Container-App-Environment'
   params: {
     location: location
     logAnalyticsWorkspaceName: logAnalyticsWorkspaceName
+    subnetId: vnet.outputs.subnetId
   }
 }
 
