@@ -122,6 +122,10 @@ resource containerApp 'Microsoft.App/containerApps@2023-08-01-preview' = {
               value: 'postgres'
             }
             {
+              name: 'DATABASE_SSL'
+              value: 'true'
+            }
+            {
               name: 'DATABASE_PORT'
               value: '5432'
             }

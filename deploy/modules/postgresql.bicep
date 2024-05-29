@@ -21,7 +21,7 @@ resource postgreSql 'Microsoft.DBforPostgreSQL/flexibleServers@2023-12-01-previe
     }
     authConfig: {
       activeDirectoryAuth: 'Enabled'
-      passwordAuth: 'Disabled'
+      passwordAuth: 'Enabled'
     }
   }
 
