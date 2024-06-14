@@ -55,16 +55,13 @@ module.exports = ({ env }) => {
         database: 'postgres',
         user: 'MyUser',
         password: 'SuperSecretPassword11!!',
-        ssl: env.bool('DATABASE_SSL', true) && {
-          key: env('DATABASE_SSL_KEY', undefined),
-          cert: env('DATABASE_SSL_CERT', undefined),
-          ca: env('DATABASE_SSL_CA', undefined),
-          capath: env('DATABASE_SSL_CAPATH', undefined),
-          cipher: env('DATABASE_SSL_CIPHER', undefined),
-          rejectUnauthorized: env.bool(
-            'DATABASE_SSL_REJECT_UNAUTHORIZED',
-            true
-          ),
+        ssl: true && {
+          key: undefined,
+          cert: undefined,
+          ca: undefined,
+          capath: undefined,
+          cipher: undefined,
+          rejectUnauthorized: true,
         },
         schema: env('DATABASE_SCHEMA', 'public'),
       },
