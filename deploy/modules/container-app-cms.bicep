@@ -115,11 +115,11 @@ resource containerApp 'Microsoft.App/containerApps@2023-08-01-preview' = {
             }
             {
               name: 'DATABASE_HOST'
-              value: postgresDbUri
+              value: 'c-cospos-xprtbv-cms.ci5sxr6s7kdeqe.postgres.cosmos.azure.com'
             }
             {
               name: 'DATABASE_NAME'
-              value: 'postgres'
+              value: 'cms'
             }
             {
               name: 'DATABASE_SSL'
@@ -131,7 +131,7 @@ resource containerApp 'Microsoft.App/containerApps@2023-08-01-preview' = {
             }
             {
               name: 'DATABASE_USERNAME'
-              value: 'MyUser'
+              value: 'citus'
             }
             {
               name: 'DATABASE_PASSWORD'
