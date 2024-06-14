@@ -49,7 +49,7 @@ resource privateEndpoint 'Microsoft.Network/privateEndpoints@2023-11-01' = {
     customNetworkInterfaceName: 'pe-xprtzbv-cms-nic'
     privateLinkServiceConnections: [
       {
-        name: 'pe-xprtzbv-cms'
+        name: 'pl-xprtzbv-cms'
         properties: {
           privateLinkServiceId: postgreSql.id
           groupIds: [
@@ -80,7 +80,7 @@ resource privateDnsZone 'Microsoft.Network/privateDnsZones@2020-06-01' = {
   location: 'global'
 
   resource vnetLink 'virtualNetworkLinks' = {
-    name: vnet.id
+    name: concat(privateDnsZone.name, '/',vnet.id)
     properties: {
       virtualNetwork: {
         id: vnet.id
