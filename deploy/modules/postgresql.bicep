@@ -80,6 +80,7 @@ resource privateDnsZone 'Microsoft.Network/privateDnsZones@2020-06-01' = {
   location: 'global'
 
   resource vnetLink 'virtualNetworkLinks' = {
+#disable-next-line prefer-interpolation
     name: concat(privateDnsZone.name, '/',vnet.id)
     properties: {
       virtualNetwork: {
