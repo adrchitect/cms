@@ -81,11 +81,11 @@ resource containerApp 'Microsoft.App/containerApps@2023-08-01-preview' = {
       ]
     }
     template: {
-      serviceBinds: [
-        {
-          serviceId: postgres.id
-        }
-      ]
+      // serviceBinds: [
+      //   {
+      //     serviceId: postgres.id
+      //   }
+      // ]
       containers: [
         {
           name: name
