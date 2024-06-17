@@ -13,22 +13,22 @@ resource keyVault 'Microsoft.KeyVault/vaults@2022-07-01' existing = {
   name: keyVaultName
 }
 
-resource containerAppEnvironment 'Microsoft.App/managedEnvironments@2022-11-01-preview' existing = {
+resource containerAppEnvironment 'Microsoft.App/managedEnvironments@2024-03-01' existing = {
   name: 'me-xprtzbv-website'
 }
 
-resource postgres 'Microsoft.App/containerApps@2023-04-01-preview' = {
-  name: 'psql-xprtzbv-cms4'
-  location: 'eastus'
-  properties: {
-    environmentId: containerAppEnvironment.id
-    configuration: {
-      service: {
-        type: 'postgres'
-      }
-    }
-  }
-}
+// resource postgres 'Microsoft.App/containerApps@2023-04-01-preview' = {
+//   name: 'psql-xprtzbv-cms4'
+//   location: 'eastus'
+//   properties: {
+//     environmentId: containerAppEnvironment.id
+//     configuration: {
+//       service: {
+//         type: 'postgres'
+//       }
+//     }
+//   }
+// }
 
 resource containerApp 'Microsoft.App/containerApps@2023-08-01-preview' = {
   name: name

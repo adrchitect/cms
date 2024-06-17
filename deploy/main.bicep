@@ -37,7 +37,7 @@ module containerAppCms 'modules/container-app-cms.bicep' = {
     containerAppUserAssignedIdentityResourceId: containerAppIdentity.id
     containerAppUserAssignedIdentityClientId: containerAppIdentity.properties.clientId
     imageTag: imageTag
-    postgresDbUri: 'psql-xprtzbv-cms4.postgres.database.azure.com'
+    postgresDbUri: postgreSQL.outputs.databaseUri
   }
 }
 
