@@ -17,6 +17,19 @@ resource containerAppEnvironment 'Microsoft.App/managedEnvironments@2022-11-01-p
   name: 'me-xprtzbv-website'
 }
 
+resource postgres 'Microsoft.App/containerApps@2023-04-01-preview' = {
+  name: 'psql-xprtzbv-cms4'
+  location: 'eastus'
+  properties: {
+    environmentId: containerAppEnvironment.id
+    configuration: {
+      service: {
+        type: 'postgres'
+      }
+    }
+  }
+}
+
 resource containerApp 'Microsoft.App/containerApps@2023-08-01-preview' = {
   name: name
   location: 'germanywestcentral'
@@ -68,6 +81,11 @@ resource containerApp 'Microsoft.App/containerApps@2023-08-01-preview' = {
       ]
     }
     template: {
+      serviceBinds: [
+        {
+          serviceId: postgres.id
+        }
+      ]
       containers: [
         {
           name: name

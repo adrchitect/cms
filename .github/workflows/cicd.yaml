@@ -18,72 +18,72 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Set up Node.js version
-        uses: actions/setup-node@v3
-        with:
-          node-version: '20.x'
-
-      - name: npm install, build, and test
-        run: |
-          npm install
-          npm run build --if-present
-
-      - name: 'Deploy to Azure Web App'
-        id: deploy-to-webapp
-        uses: azure/webapps-deploy@v2
-        with:
-          app-name: 'app-xprtzbv-cms'
-          slot-name: 'production'
-          package: .
-          publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
-
-      # - name: Azure login
-      #   uses: azure/login@v2
+      # - name: Set up Node.js version
+      #   uses: actions/setup-node@v3
       #   with:
-      #     client-id: ${{ secrets.AZURE_CLIENT_ID }}
-      #     tenant-id: ${{ secrets.AZURE_TENANT_ID }}
-      #     subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+      #     node-version: '20.x'
 
-      # - name: Show subscription details
-      #   uses: azure/CLI@v2
-      #   with:
-      #     azcliversion: latest
-      #     inlineScript: |
-      #       az account show
-
-      # - name: Deploy infrastructure
-      #   uses: azure/arm-deploy@v2
-      #   with:
-      #     scope: subscription
-      #     region: westeurope
-      #     subscriptionId: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-      #     template: ./deploy/infrastructure.bicep
-      #     failOnStdErr: false
-
-      # - name: "Login to ACR"
+      # - name: npm install, build, and test
       #   run: |
-      #     set -euo pipefail
-      #     access_token=$(az account get-access-token --query accessToken -o tsv)
-      #     refresh_token=$(curl https://${{ secrets.REGISTRY_NAME }}.azurecr.io/oauth2/exchange -v -d "grant_type=access_token&service=${{ secrets.REGISTRY_NAME }}.azurecr.io&access_token=$access_token" | jq -r .refresh_token)
-      #     docker login -u 00000000-0000-0000-0000-000000000000 --password-stdin ${{ secrets.REGISTRY_NAME }}.azurecr.io <<< "$refresh_token"
+      #     npm install
+      #     npm run build --if-present
 
-      # - name: Build and push container image
-      #   uses: docker/build-push-action@v5
+      # - name: 'Deploy to Azure Web App'
+      #   id: deploy-to-webapp
+      #   uses: azure/webapps-deploy@v2
       #   with:
-      #     push: true
-      #     tags: ${{ secrets.REGISTRY_NAME }}.azurecr.io/cms:latest
-      #     file: ./Dockerfile.prod
-      #     build-args: |
-      #       NODE_ENV=production
+      #     app-name: 'app-xprtzbv-cms'
+      #     slot-name: 'production'
+      #     package: .
+      #     publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
 
-      # - name: Deploy cms
-      #   uses: azure/arm-deploy@v2
-      #   with:
-      #     scope: subscription
-      #     region: westeurope
-      #     subscriptionId: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-      #     template: ./deploy/main.bicep
-      #     failOnStdErr: false
+      - name: Azure login
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Show subscription details
+        uses: azure/CLI@v2
+        with:
+          azcliversion: latest
+          inlineScript: |
+            az account show
+
+      - name: Deploy infrastructure
+        uses: azure/arm-deploy@v2
+        with:
+          scope: subscription
+          region: westeurope
+          subscriptionId: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          template: ./deploy/infrastructure.bicep
+          failOnStdErr: false
+
+      - name: "Login to ACR"
+        run: |
+          set -euo pipefail
+          access_token=$(az account get-access-token --query accessToken -o tsv)
+          refresh_token=$(curl https://${{ secrets.REGISTRY_NAME }}.azurecr.io/oauth2/exchange -v -d "grant_type=access_token&service=${{ secrets.REGISTRY_NAME }}.azurecr.io&access_token=$access_token" | jq -r .refresh_token)
+          docker login -u 00000000-0000-0000-0000-000000000000 --password-stdin ${{ secrets.REGISTRY_NAME }}.azurecr.io <<< "$refresh_token"
+
+      - name: Build and push container image
+        uses: docker/build-push-action@v5
+        with:
+          push: true
+          tags: ${{ secrets.REGISTRY_NAME }}.azurecr.io/cms:latest
+          file: ./Dockerfile.prod
+          build-args: |
+            NODE_ENV=production
+
+      - name: Deploy cms
+        uses: azure/arm-deploy@v2
+        with:
+          scope: subscription
+          region: westeurope
+          subscriptionId: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          template: ./deploy/main.bicep
+          failOnStdErr: false
 
   Production:
     needs: Preview
