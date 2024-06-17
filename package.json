@@ -5,6 +5,7 @@
   "description": "A Strapi application",
   "scripts": {
     "develop": "strapi develop",
+    "start-appservice": "node node_modules/@strapi/strapi/bin/strapi.js start",
     "start": "strapi develop --debug",
     "build": "strapi build",
     "strapi": "strapi"
