@@ -38,23 +38,4 @@ resource postgreSql 'Microsoft.DBforPostgreSQL/flexibleServers@2023-12-01-previe
   }
 }
 
-resource privateEndpoint 'Microsoft.Network/privateEndpoints@2023-11-01' = {
-  name: 'pe-xprtzbv-cms'
-  location: location
-  properties: {
-    customNetworkInterfaceName: 'pe-xprtzbv-cms-nic'
-    privateLinkServiceConnections: [
-      {
-        name: 'pl-xprtzbv-cms'
-        properties: {
-          privateLinkServiceId: postgreSql.id
-          groupIds: [
-            'postgresqlServer'
-          ]
-        }
-      }
-    ]
-  }
-}
-
 output databaseUri string = '${postgreSql.name}.postgres.database.azure.com'
