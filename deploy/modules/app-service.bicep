@@ -45,41 +45,6 @@ resource webApplication 'Microsoft.Web/sites@2021-01-15' = {
       DATABASE_PASSWORD: '@Microsoft.KeyVault(VaultName=${keyvaultName};SecretName=${toLower('DATABASE-PASSWORD')})'
     }
   }
-
-  resource preproductionSlot 'slots' = {
-    name: 'preproduction'
-    location: location
-    identity: {
-      type: 'UserAssigned'
-      userAssignedIdentities: {
-        '${appIdentityId}': {}
-      }
-    }
-    properties: {
-      serverFarmId: appServicePlan.id
-    }
-
-    resource appsettings 'config' = {
-      name: 'appsettings'
-      properties: {
-        APPLICATIONINSIGHTS_CONNECTION_STRING: appInsights.properties.ConnectionString
-        ApplicationInsightsAgent_EXTENSION_VERSION: '~3'
-        XDT_MicrosoftApplicationInsights_Mode: 'default'
-        APP_KEYS: '@Microsoft.KeyVault(VaultName=${keyvaultName};SecretName=${toLower('APP-KEYS')})'
-        API_TOKEN_SALT: '@Microsoft.KeyVault(VaultName=${keyvaultName};SecretName=${toLower('API-TOKEN-SALT')})'
-        ADMIN_JWT_SECRET: '@Microsoft.KeyVault(VaultName=${keyvaultName};SecretName=${toLower('ADMIN-JWT-SECRET')})'
-        TRANSFER_TOKEN_SALT: '@Microsoft.KeyVault(VaultName=${keyvaultName};SecretName=${toLower('TRANSFER-TOKEN-SALT')})'
-        JWT_SECRET: '@Microsoft.KeyVault(VaultName=${keyvaultName};SecretName=${toLower('JWT-SECRET')})'
-        DATABASE_CLIENT: 'postgres'
-        DATABASE_HOST: postgresDbUri
-        DATABASE_NAME: 'postgres'
-        DATABASE_SSL: 'true'
-        DATABASE_PORT: '5432'
-        DATABASE_USERNAME: '@Microsoft.KeyVault(VaultName=${keyvaultName};SecretName=${toLower('DATABASE-USERNAME')})'
-        DATABASE_PASSWORD: '@Microsoft.KeyVault(VaultName=${keyvaultName};SecretName=${toLower('DATABASE-PASSWORD')})'
-      }
-    }
-  }
 }
 
 output appUrl string = webApplication.properties.defaultHostName
