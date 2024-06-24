@@ -9,7 +9,7 @@ var resourceGroupName = 'rg-${defaultWebsiteName}'
 var appIdentityName = 'id-${defaultWebsiteName}'
 var frontDoorEndpointName = 'fde-${defaultCmsName}'
 var keyVaultName = 'kv-${defaultCmsName}'
-var postgreSqlName = 'psql-${defaultCmsName}'
+var postgreSqlName = 'psql-${defaultCmsName}5'
 
 resource resourceGroup 'Microsoft.Resources/resourceGroups@2021-04-01' existing = {
   name: resourceGroupName
