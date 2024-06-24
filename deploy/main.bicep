@@ -3,19 +3,21 @@ targetScope = 'subscription'
 param location string = 'westeurope'
 param imageTag string = 'latest'
 
-var resourceGroupName = 'rg-xprtzbv-website'
-var containerAppIdentityName = 'id-xprtzbv-website'
-var frontDoorEndpointName = 'fde-xprtzbv-cms'
-var keyVaultName = 'kv-xprtzbv-cms'
-var postgreSqlName = 'psql-xprtzbv-cms4'
+var defaultWebsiteName = 'xprtzbv-cms'
+var defaultCmsName = 'xprtzbv-cms'
+var resourceGroupName = 'rg-${defaultWebsiteName}'
+var appIdentityName = 'id-${defaultWebsiteName}'
+var frontDoorEndpointName = 'fde-${defaultCmsName}'
+var keyVaultName = 'kv-${defaultCmsName}'
+var postgreSqlName = 'psql-${defaultCmsName}4'
 
 resource resourceGroup 'Microsoft.Resources/resourceGroups@2021-04-01' existing = {
   name: resourceGroupName
 }
 
-resource containerAppIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' existing = {
+resource appIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' existing = {
   scope: resourceGroup
-  name: containerAppIdentityName
+  name: appIdentityName
 }
 
 module keyVault 'modules/key-vault.bicep' = {
@@ -24,29 +26,41 @@ module keyVault 'modules/key-vault.bicep' = {
   params: {
     location: location
     keyVaultName: keyVaultName
-    containerAppUserAssignedIdentityPrincipalIds: [ containerAppIdentity.properties.principalId ]
+    containerAppUserAssignedIdentityPrincipalIds: [ appIdentity.properties.principalId ]
   }
 }
 
-module containerAppCms 'modules/container-app-cms.bicep' = {
+module appService 'modules/app-service.bicep' = {
   scope: resourceGroup
-  name: 'Deploy-Container-App-Cms'
+  name: 'Deploy-AppService-Cms'
   params: {
-    // location: location
-    keyVaultName: keyVaultName
-    containerAppUserAssignedIdentityResourceId: containerAppIdentity.id
-    containerAppUserAssignedIdentityClientId: containerAppIdentity.properties.clientId
-    imageTag: imageTag
+    defaultName: defaultCmsName
+    keyvaultName: keyVault.outputs.keyVaultName
+    location: location
+    appIdentityId: appIdentity.id
     postgresDbUri: postgreSQL.outputs.databaseUri
   }
 }
+
+// module containerAppCms 'modules/container-app-cms.bicep' = {
+//   scope: resourceGroup
+//   name: 'Deploy-Container-App-Cms'
+//   params: {
+//     // location: location
+//     keyVaultName: keyVaultName
+//     containerAppUserAssignedIdentityResourceId: appIdentity.id
+//     containerAppUserAssignedIdentityClientId: appIdentity.properties.clientId
+//     imageTag: imageTag
+//     postgresDbUri: postgreSQL.outputs.databaseUri
+//   }
+// }
 
 module frontDoor 'modules/front-door.bicep' = if (imageTag == 'latest') {
   scope: resourceGroup
   name: 'Deploy-Front-Door'
   params: {
     frontDoorEndpointName: frontDoorEndpointName
-    originHostname: containerAppCms.outputs.containerAppUrl
+    originHostname: appService.outputs.appUrl
   }
 }
 
@@ -56,7 +70,7 @@ module postgreSQL 'modules/postgresql.bicep' = {
   params: {
     resourceName: postgreSqlName
     location: 'germanywestcentral'
-    cmsUami: containerAppIdentity.properties.principalId
-    cmsUamiName: containerAppIdentity.name
+    cmsUami: appIdentity.properties.principalId
+    cmsUamiName: appIdentity.name
   }
 }
