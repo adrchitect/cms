@@ -3,13 +3,13 @@ targetScope = 'subscription'
 param location string = 'westeurope'
 param imageTag string = 'latest'
 
-var defaultWebsiteName = 'xprtzbv-cms'
+var defaultWebsiteName = 'xprtzbv-website'
 var defaultCmsName = 'xprtzbv-cms'
 var resourceGroupName = 'rg-${defaultWebsiteName}'
 var appIdentityName = 'id-${defaultWebsiteName}'
 var frontDoorEndpointName = 'fde-${defaultCmsName}'
 var keyVaultName = 'kv-${defaultCmsName}'
-var postgreSqlName = 'psql-${defaultCmsName}4'
+var postgreSqlName = 'psql-${defaultCmsName}'
 
 resource resourceGroup 'Microsoft.Resources/resourceGroups@2021-04-01' existing = {
   name: resourceGroupName

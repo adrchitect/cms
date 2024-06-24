@@ -4,29 +4,12 @@ param appIdentityId string
 param keyvaultName string
 param postgresDbUri string
 
-resource logWorkspace 'Microsoft.OperationalInsights/workspaces@2023-09-01' = {
-  name: 'law-${defaultName}'
-  location: location
-}
-
-resource appInsights 'Microsoft.Insights/components@2020-02-02' = {
-  name: 'appi-${defaultName}'
-  location: location
-  kind: 'web'
-  properties: {
-    Application_Type: 'web'
-    WorkspaceResourceId: logWorkspace.id
-  }
-}
-
-resource appServicePlan 'Microsoft.Web/serverfarms@2020-12-01' = {
+resource appServicePlan 'Microsoft.Web/serverfarms@2023-12-01' existing = {
   name: 'asp-${defaultName}'
-  location: location
-  kind: 'linux'
-  sku: {
-    name: 'B1'
-    tier: 'Basic'
-  }
+}
+
+resource appInsights 'Microsoft.Insights/components@2020-02-02' existing = {
+  name: 'appi-${defaultName}'
 }
 
 resource webApplication 'Microsoft.Web/sites@2021-01-15' = {

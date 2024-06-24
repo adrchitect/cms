@@ -5,6 +5,7 @@ param location string = 'westeurope'
 var sharedValues = json(loadTextContent('shared-values.json'))
 var subscriptionId = sharedValues.subscriptionIds.common
 var acrResourceGroupName = sharedValues.resources.acr.resourceGroupName
+var defaultCmsName = 'xprtzbv-cms'
 var resourceGroupName = 'rg-xprtzbv-website'
 var logAnalyticsWorkspaceName = 'log-xprtzbv-website'
 
@@ -30,23 +31,34 @@ module acrAndRoleAssignment 'modules/roleassignments.bicep' = {
   }
 }
 
-module vnet 'modules/vnet-cms.bicep' = {
+module appServicePlan 'modules/app-service-plan.bicep' = {
   scope: resourceGroup
-  name: 'Deploy-vnet-cms'
+  name: 'Deploy-AppServicePlan'
   params: {
-    // location: location
+    defaultName: defaultCmsName
+    location: location
   }
 }
 
-module containerAppEnvironment 'modules/container-app-environment.bicep' = {
+module appInsights 'modules/app-insights.bicep' = {
   scope: resourceGroup
-  name: 'Deploy-Container-App-Environment'
+  name: 'Deploy-AppInsights'
   params: {
+    defaultName: defaultCmsName
     location: location
-    logAnalyticsWorkspaceName: logAnalyticsWorkspaceName
-    subnetId: vnet.outputs.subnetId
+
   }
 }
+
+// module containerAppEnvironment 'modules/container-app-environment.bicep' = {
+//   scope: resourceGroup
+//   name: 'Deploy-Container-App-Environment'
+//   params: {
+//     location: location
+//     logAnalyticsWorkspaceName: logAnalyticsWorkspaceName
+//     subnetId: vnet.outputs.subnetId
+//   }
+// }
 
 module frontDoor 'modules/front-door-profile.bicep' = {
   scope: resourceGroup

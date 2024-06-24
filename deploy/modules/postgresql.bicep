@@ -15,7 +15,7 @@ resource vnet 'Microsoft.Network/virtualNetworks@2023-11-01' existing = {
 
 resource postgreSql 'Microsoft.DBforPostgreSQL/flexibleServers@2023-12-01-preview' = {
   name: resourceName
-  location: 'eastus'
+  location: location
   sku: {
     name: 'Standard_B1ms'
     tier: 'Burstable'
