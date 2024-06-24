@@ -7,7 +7,6 @@ var subscriptionId = sharedValues.subscriptionIds.common
 var acrResourceGroupName = sharedValues.resources.acr.resourceGroupName
 var defaultCmsName = 'xprtzbv-cms'
 var resourceGroupName = 'rg-xprtzbv-website'
-var logAnalyticsWorkspaceName = 'log-xprtzbv-website'
 
 resource resourceGroup 'Microsoft.Resources/resourceGroups@2021-04-01' = {
   name: resourceGroupName
@@ -55,7 +54,7 @@ module appInsights 'modules/app-insights.bicep' = {
 //   name: 'Deploy-Container-App-Environment'
 //   params: {
 //     location: location
-//     logAnalyticsWorkspaceName: logAnalyticsWorkspaceName
+//     logAnalyticsWorkspaceName: appInsights.outputs.logAnalyticsWorkspaceName
 //     subnetId: vnet.outputs.subnetId
 //   }
 // }
@@ -65,6 +64,6 @@ module frontDoor 'modules/front-door-profile.bicep' = {
   name: 'Deploy-Front-Door-Profile'
   params: {
     frontDoorSkuName: 'Standard_AzureFrontDoor'
-    logAnalyticsWorkspaceName: logAnalyticsWorkspaceName
+    logAnalyticsWorkspaceName: appInsights.outputs.logAnalyticsWorkspaceName
   }
 }
