@@ -3,16 +3,6 @@ param location string
 param cmsUami string
 param cmsUamiName string
 
-var globalLocation = 'global'
-
-resource vnet 'Microsoft.Network/virtualNetworks@2023-11-01' existing = {
-  name: 'vnet-xprtzbv-cms'
-
-  resource subnet 'subnets' existing = {
-    name: 'sn1'
-  }
-}
-
 resource postgreSql 'Microsoft.DBforPostgreSQL/flexibleServers@2023-12-01-preview' = {
   name: resourceName
   location: location
@@ -53,9 +43,6 @@ resource privateEndpoint 'Microsoft.Network/privateEndpoints@2023-11-01' = {
   location: location
   properties: {
     customNetworkInterfaceName: 'pe-xprtzbv-cms-nic'
-    subnet: {
-      id: vnet::subnet.id
-    }
     privateLinkServiceConnections: [
       {
         name: 'pl-xprtzbv-cms'
@@ -67,36 +54,6 @@ resource privateEndpoint 'Microsoft.Network/privateEndpoints@2023-11-01' = {
         }
       }
     ]
-  }
-
-  resource defaultGroup 'privateDnsZoneGroups' = {
-    name: 'default'
-    properties: {
-      privateDnsZoneConfigs: [
-        {
-          name: 'privatelink-postgres-database-azure-com'
-          properties: {
-            privateDnsZoneId: privateDnsZone.id
-          }
-        }
-      ]
-    }
-  }
-}
-
-resource privateDnsZone 'Microsoft.Network/privateDnsZones@2020-06-01' = {
-  name: 'privatelink.postgres.database.azure.com'
-  location: globalLocation
-
-  resource vnetLink 'virtualNetworkLinks' = {
-    name: vnet.name
-    location: globalLocation
-    properties: {
-      virtualNetwork: {
-        id: vnet.id
-      }
-      registrationEnabled: false
-    }
   }
 }
 
