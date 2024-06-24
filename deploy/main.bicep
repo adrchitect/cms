@@ -2,6 +2,9 @@ targetScope = 'subscription'
 
 param location string = 'westeurope'
 param imageTag string = 'latest'
+param postgresAdministratorLogin string
+@secure()
+param postgresAdministratorLoginPassword string
 
 var defaultWebsiteName = 'xprtzbv-website'
 var defaultCmsName = 'xprtzbv-cms'
@@ -72,5 +75,7 @@ module postgreSQL 'modules/postgresql.bicep' = {
     location: 'germanywestcentral'
     cmsUami: appIdentity.properties.principalId
     cmsUamiName: appIdentity.name
+    administratorLogin: postgresAdministratorLogin
+    administratorLoginPassword: postgresAdministratorLoginPassword
   }
 }

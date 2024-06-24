@@ -2,6 +2,9 @@ param resourceName string
 param location string
 param cmsUami string
 param cmsUamiName string
+param administratorLogin string
+@secure()
+param administratorLoginPassword string
 
 resource postgreSql 'Microsoft.DBforPostgreSQL/flexibleServers@2023-12-01-preview' = {
   name: resourceName
@@ -11,6 +14,8 @@ resource postgreSql 'Microsoft.DBforPostgreSQL/flexibleServers@2023-12-01-previe
     tier: 'Burstable'
   }
   properties: {
+    administratorLogin: administratorLogin
+    administratorLoginPassword: administratorLoginPassword
     createMode: 'Default'
     version: '16'
     storage: {

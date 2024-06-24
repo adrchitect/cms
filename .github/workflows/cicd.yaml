@@ -64,6 +64,7 @@ jobs:
           region: westeurope
           subscriptionId: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
           template: ./deploy/main.bicep
+          parameters: postgresAdministratorLogin=${{ secrets.POSTGRES_ADMINISTRATORLOGIN }} postgresAdministratorLoginPassword=${{ secrets.POSTGRES_ADMINISTRATORLOGIN_PASSWORD }}
           failOnStdErr: false
 
       - name: Set up Node.js version

@@ -23,72 +23,63 @@ resource webApplication 'Microsoft.Web/sites@2021-01-15' = {
   }
   properties: {
     serverFarmId: appServicePlan.id
-    siteConfig: {
-      appSettings: [
-        {
-          name: 'APPLICATIONINSIGHTS_CONNECTION_STRING'
-          value: appInsights.properties.ConnectionString
-        }
-        {
-          name: 'ApplicationInsightsAgent_EXTENSION_VERSION'
-          value: '~3'
-        }
-        {
-          name: 'XDT_MicrosoftApplicationInsights_Mode'
-          value: 'default'
-        }
-        {
-          name: 'APP_KEYS'
-          value: '@Microsoft.KeyVault(VaultName=${keyvaultName};SecretName=${toLower('APP-KEYS')})'
-        }
-        {
-          name: 'API_TOKEN_SALT'
-          value: '@Microsoft.KeyVault(VaultName=${keyvaultName};SecretName=${toLower('API-TOKEN-SALT')})'
-        }
-        {
-          name: 'ADMIN_JWT_SECRET'
-          value: '@Microsoft.KeyVault(VaultName=${keyvaultName};SecretName=${toLower('ADMIN-JWT-SECRET')})'
-        }
-        {
-          name: 'TRANSFER_TOKEN_SALT'
-          value: '@Microsoft.KeyVault(VaultName=${keyvaultName};SecretName=${toLower('TRANSFER-TOKEN-SALT')})'
-        }
-        {
-          name: 'JWT_SECRET'
-          value: '@Microsoft.KeyVault(VaultName=${keyvaultName};SecretName=${toLower('JWT-SECRET')})'
-        }
-        {
-          name: 'DATABASE_CLIENT'
-          value: 'postgres'
-        }
-        {
-          name: 'DATABASE_HOST'
-          value: postgresDbUri
-        }
-        {
-          name: 'DATABASE_NAME'
-          value: 'postgres'
-        }
-        {
-          name: 'DATABASE_SSL'
-          value: 'true'
-        }
-        {
-          name: 'DATABASE_PORT'
-          value: '5432'
-        }
-        {
-          name: 'DATABASE_USERNAME'
-          value: '@Microsoft.KeyVault(VaultName=${keyvaultName};SecretName=${toLower('DATABASE-USERNAME')})'
-        }
-        {
-          name: 'DATABASE_PASSWORD'
-          value: '@Microsoft.KeyVault(VaultName=${keyvaultName};SecretName=${toLower('DATABASE-PASSWORD')})'
-        }
-      ]
+  }
+
+  resource appsettings 'config' = {
+    name: 'appsettings'
+    properties: {
+      APPLICATIONINSIGHTS_CONNECTION_STRING: appInsights.properties.ConnectionString
+      ApplicationInsightsAgent_EXTENSION_VERSION: '~3'
+      XDT_MicrosoftApplicationInsights_Mode: 'default'
+      APP_KEYS: '@Microsoft.KeyVault(VaultName=${keyvaultName};SecretName=${toLower('APP-KEYS')})'
+      API_TOKEN_SALT: '@Microsoft.KeyVault(VaultName=${keyvaultName};SecretName=${toLower('API-TOKEN-SALT')})'
+      ADMIN_JWT_SECRET: '@Microsoft.KeyVault(VaultName=${keyvaultName};SecretName=${toLower('ADMIN-JWT-SECRET')})'
+      TRANSFER_TOKEN_SALT: '@Microsoft.KeyVault(VaultName=${keyvaultName};SecretName=${toLower('TRANSFER-TOKEN-SALT')})'
+      JWT_SECRET: '@Microsoft.KeyVault(VaultName=${keyvaultName};SecretName=${toLower('JWT-SECRET')})'
+      DATABASE_CLIENT: 'postgres'
+      DATABASE_HOST: postgresDbUri
+      DATABASE_NAME: 'postgres'
+      DATABASE_SSL: 'true'
+      DATABASE_PORT: '5432'
+      DATABASE_USERNAME: '@Microsoft.KeyVault(VaultName=${keyvaultName};SecretName=${toLower('DATABASE-USERNAME')})'
+      DATABASE_PASSWORD: '@Microsoft.KeyVault(VaultName=${keyvaultName};SecretName=${toLower('DATABASE-PASSWORD')})'
+    }
+  }
+
+  resource preproductionSlot 'slots' = {
+    name: 'preproduction'
+    location: location
+    identity: {
+      type: 'UserAssigned'
+      userAssignedIdentities: {
+        '${appIdentityId}': {}
+      }
+    }
+    properties: {
+      serverFarmId: appServicePlan.id
+    }
+
+    resource appsettings 'config' = {
+      name: 'appsettings'
+      properties: {
+        APPLICATIONINSIGHTS_CONNECTION_STRING: appInsights.properties.ConnectionString
+        ApplicationInsightsAgent_EXTENSION_VERSION: '~3'
+        XDT_MicrosoftApplicationInsights_Mode: 'default'
+        APP_KEYS: '@Microsoft.KeyVault(VaultName=${keyvaultName};SecretName=${toLower('APP-KEYS')})'
+        API_TOKEN_SALT: '@Microsoft.KeyVault(VaultName=${keyvaultName};SecretName=${toLower('API-TOKEN-SALT')})'
+        ADMIN_JWT_SECRET: '@Microsoft.KeyVault(VaultName=${keyvaultName};SecretName=${toLower('ADMIN-JWT-SECRET')})'
+        TRANSFER_TOKEN_SALT: '@Microsoft.KeyVault(VaultName=${keyvaultName};SecretName=${toLower('TRANSFER-TOKEN-SALT')})'
+        JWT_SECRET: '@Microsoft.KeyVault(VaultName=${keyvaultName};SecretName=${toLower('JWT-SECRET')})'
+        DATABASE_CLIENT: 'postgres'
+        DATABASE_HOST: postgresDbUri
+        DATABASE_NAME: 'postgres'
+        DATABASE_SSL: 'true'
+        DATABASE_PORT: '5432'
+        DATABASE_USERNAME: '@Microsoft.KeyVault(VaultName=${keyvaultName};SecretName=${toLower('DATABASE-USERNAME')})'
+        DATABASE_PASSWORD: '@Microsoft.KeyVault(VaultName=${keyvaultName};SecretName=${toLower('DATABASE-PASSWORD')})'
+      }
     }
   }
 }
-
 
 output appUrl string = webApplication.properties.defaultHostName
