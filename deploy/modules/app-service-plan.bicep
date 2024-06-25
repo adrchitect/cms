@@ -9,4 +9,7 @@ resource appServicePlan 'Microsoft.Web/serverfarms@2020-12-01' = {
     tier: 'Basic'
   }
   kind: 'linux'
+  properties: {
+    reserved: true
+  }
 }

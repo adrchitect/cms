@@ -23,7 +23,7 @@ resource webApplication 'Microsoft.Web/sites@2021-01-15' = {
   }
   properties: {
     siteConfig: {
-      linuxFxVersion: 'node|14-lts'
+      linuxFxVersion: 'NODE|20-lts'
     }
     serverFarmId: appServicePlan.id
     keyVaultReferenceIdentity: appIdentityId
