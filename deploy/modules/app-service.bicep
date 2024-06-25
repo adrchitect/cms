@@ -23,6 +23,7 @@ resource webApplication 'Microsoft.Web/sites@2021-01-15' = {
   }
   properties: {
     serverFarmId: appServicePlan.id
+    keyVaultReferenceIdentity: appIdentityId
   }
 
   resource appsettings 'config' = {
