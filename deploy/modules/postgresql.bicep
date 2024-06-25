@@ -41,6 +41,14 @@ resource postgreSql 'Microsoft.DBforPostgreSQL/flexibleServers@2023-12-01-previe
       principalName: cmsUamiName
     }
   }
+
+  resource allowAllWindowsAzureIps 'firewallRules' = {
+    name: 'AllowAllWindowsAzureIps'
+    properties: {
+      startIpAddress: '0.0.0.0'
+      endIpAddress: '0.0.0.0'
+    }
+  }
 }
 
 output databaseUri string = '${postgreSql.name}.postgres.database.azure.com'
