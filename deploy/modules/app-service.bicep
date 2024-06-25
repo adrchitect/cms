@@ -36,6 +36,7 @@ resource webApplication 'Microsoft.Web/sites@2021-01-15' = {
       APPLICATIONINSIGHTS_CONNECTION_STRING: appInsights.properties.ConnectionString
       ApplicationInsightsAgent_EXTENSION_VERSION: '~3'
       XDT_MicrosoftApplicationInsights_Mode: 'default'
+      WEBSITE_RUN_FROM_PACKAGE: '1'
       APP_KEYS: '@Microsoft.KeyVault(VaultName=${keyvaultName};SecretName=${toLower('APP-KEYS')})'
       API_TOKEN_SALT: '@Microsoft.KeyVault(VaultName=${keyvaultName};SecretName=${toLower('API-TOKEN-SALT')})'
       ADMIN_JWT_SECRET: '@Microsoft.KeyVault(VaultName=${keyvaultName};SecretName=${toLower('ADMIN-JWT-SECRET')})'
