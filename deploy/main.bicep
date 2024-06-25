@@ -45,19 +45,6 @@ module appService 'modules/app-service.bicep' = {
   }
 }
 
-// module containerAppCms 'modules/container-app-cms.bicep' = {
-//   scope: resourceGroup
-//   name: 'Deploy-Container-App-Cms'
-//   params: {
-//     // location: location
-//     keyVaultName: keyVaultName
-//     containerAppUserAssignedIdentityResourceId: appIdentity.id
-//     containerAppUserAssignedIdentityClientId: appIdentity.properties.clientId
-//     imageTag: imageTag
-//     postgresDbUri: postgreSQL.outputs.databaseUri
-//   }
-// }
-
 module frontDoor 'modules/front-door.bicep' = if (imageTag == 'latest') {
   scope: resourceGroup
   name: 'Deploy-Front-Door'

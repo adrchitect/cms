@@ -49,16 +49,6 @@ module appInsights 'modules/app-insights.bicep' = {
   }
 }
 
-// module containerAppEnvironment 'modules/container-app-environment.bicep' = {
-//   scope: resourceGroup
-//   name: 'Deploy-Container-App-Environment'
-//   params: {
-//     location: location
-//     logAnalyticsWorkspaceName: appInsights.outputs.logAnalyticsWorkspaceName
-//     subnetId: vnet.outputs.subnetId
-//   }
-// }
-
 module frontDoor 'modules/front-door-profile.bicep' = {
   scope: resourceGroup
   name: 'Deploy-Front-Door-Profile'
