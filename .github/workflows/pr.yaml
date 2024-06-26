@@ -39,7 +39,7 @@ jobs:
           region: westeurope
           subscriptionId: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
           template: ./deploy/main.bicep
-          parameters: applicationTag=${{ env.GITHUB_REF_NAME_SLUG }}
+          parameters: applicationTag=${{ env.GITHUB_REF_NAME_SLUG }} postgresAdministratorLogin=${{ secrets.POSTGRES_ADMINISTRATORLOGIN }} postgresAdministratorLoginPassword=${{ secrets.POSTGRES_ADMINISTRATORLOGIN_PASSWORD }}
           failOnStdErr: false
 
       - name: Set up Node.js version
