@@ -33,14 +33,14 @@ resource postgreSql 'Microsoft.DBforPostgreSQL/flexibleServers@2023-12-01-previe
     }
   }
 
-  resource administrators 'administrators' = {
-    name: cmsUami
-    properties: {
-      tenantId: tenant().tenantId
-      principalType: 'ServicePrincipal'
-      principalName: cmsUamiName
-    }
-  }
+  // resource administrators 'administrators' = {
+  //   name: cmsUami
+  //   properties: {
+  //     tenantId: tenant().tenantId
+  //     principalType: 'ServicePrincipal'
+  //     principalName: cmsUamiName
+  //   }
+  // }
 
   resource allowAllWindowsAzureIps 'firewallRules' = {
     name: 'AllowAllWindowsAzureIps'
