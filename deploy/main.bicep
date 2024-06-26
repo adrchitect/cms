@@ -1,7 +1,7 @@
 targetScope = 'subscription'
 
 param location string = 'westeurope'
-param imageTag string = 'latest'
+param applicationTag string = ''
 param postgresAdministratorLogin string
 @secure()
 param postgresAdministratorLoginPassword string
@@ -42,10 +42,11 @@ module appService 'modules/app-service.bicep' = {
     location: location
     appIdentityId: appIdentity.id
     postgresDbUri: postgreSQL.outputs.databaseUri
+    applicationTag: applicationTag
   }
 }
 
-module frontDoor 'modules/front-door.bicep' = if (imageTag == 'latest') {
+module frontDoor 'modules/front-door.bicep' = if (applicationTag == '') {
   scope: resourceGroup
   name: 'Deploy-Front-Door'
   params: {

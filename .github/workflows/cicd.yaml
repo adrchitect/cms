@@ -66,10 +66,11 @@ jobs:
           zip -r strapi.zip .
 
       - name: 'Deploy to Azure Web App'
-        id: deploy-to-webapp
         uses: azure/webapps-deploy@v2
         with:
           app-name: 'app-xprtzbv-cms'
-          slot-name: 'production'
           package: strapi.zip
-          publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
+
+      - name: logout
+        run: |
+          az logout

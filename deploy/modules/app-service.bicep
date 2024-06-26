@@ -3,6 +3,9 @@ param location string
 param appIdentityId string
 param keyvaultName string
 param postgresDbUri string
+param applicationTag string
+
+var webApplicationName = applicationTag == '' ? 'app-${defaultName}' : 'app-${defaultName}-${applicationTag}'
 
 resource appServicePlan 'Microsoft.Web/serverfarms@2023-12-01' existing = {
   name: 'asp-${defaultName}'
@@ -13,7 +16,7 @@ resource appInsights 'Microsoft.Insights/components@2020-02-02' existing = {
 }
 
 resource webApplication 'Microsoft.Web/sites@2021-01-15' = {
-  name: 'app-${defaultName}'
+  name: webApplicationName
   location: location
   identity: {
     type: 'UserAssigned'
