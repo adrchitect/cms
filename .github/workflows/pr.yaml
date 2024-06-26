@@ -66,10 +66,10 @@ jobs:
         run: |
           az logout
 
-  remove_container_appp:
+  remove_webapp:
     runs-on: ubuntu-latest
     environment: preview
-    name: Remove container app
+    name: Remove webapp
     if: github.event.action == 'closed'
     steps:
       - name: Inject slug/short variables
@@ -84,7 +84,7 @@ jobs:
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
-      - name: Remove container app and related resources
+      - name: Remove webapp
         uses: azure/CLI@v2
         with:
           azcliversion: latest
