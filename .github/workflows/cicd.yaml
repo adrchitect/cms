@@ -14,10 +14,6 @@ jobs:
     runs-on: ubuntu-latest
     environment: preview
     steps:
-      - uses: actions/checkout@main
-        with:
-          fetch-depth: 0
-
       - name: Azure login
         uses: azure/login@v2
         with:
@@ -32,14 +28,25 @@ jobs:
           inlineScript: |
             az account show
 
-      - name: Deploy infrastructure
-        uses: azure/arm-deploy@v2
+      - uses: actions/checkout@main
         with:
-          scope: subscription
-          region: westeurope
-          subscriptionId: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-          template: ./deploy/infrastructure.bicep
-          failOnStdErr: false
+          fetch-depth: 0
+
+      - name: "Login to ACR"
+        run: |
+          set -euo pipefail
+          access_token=$(az account get-access-token --query accessToken -o tsv)
+          refresh_token=$(curl https://${{ secrets.REGISTRY_NAME }}.azurecr.io/oauth2/exchange -v -d "grant_type=access_token&service=${{ secrets.REGISTRY_NAME }}.azurecr.io&access_token=$access_token" | jq -r .refresh_token)
+          docker login -u 00000000-0000-0000-0000-000000000000 --password-stdin ${{ secrets.REGISTRY_NAME }}.azurecr.io <<< "$refresh_token"
+
+      - name: Build and push container image
+        uses: docker/build-push-action@v5
+        with:
+          push: true
+          tags: ${{ secrets.REGISTRY_NAME }}.azurecr.io/cms:latest
+          file: ./Dockerfile.prod
+          build-args: |
+            NODE_ENV=production
 
       - name: Deploy cms
         uses: azure/arm-deploy@v2
@@ -50,3 +57,4 @@ jobs:
           template: ./deploy/main.bicep
           parameters: environment=preview
           failOnStdErr: false
+

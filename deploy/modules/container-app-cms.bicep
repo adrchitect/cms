@@ -50,7 +50,7 @@ resource containerApp 'Microsoft.App/containerApps@2023-08-01-preview' = {
       ]
       ingress: {
         external: true
-        targetPort: 80
+        targetPort: 1337
       }
       secrets: [
         {
