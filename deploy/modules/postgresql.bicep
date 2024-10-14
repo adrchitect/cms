@@ -1,7 +1,5 @@
 param resourceName string
 param location string
-param cmsUami string
-param cmsUamiName string
 param administratorLogin string
 @secure()
 param administratorLoginPassword string
@@ -32,15 +30,6 @@ resource postgreSql 'Microsoft.DBforPostgreSQL/flexibleServers@2023-12-01-previe
       passwordAuth: 'Enabled'
     }
   }
-
-  // resource administrators 'administrators' = {
-  //   name: cmsUami
-  //   properties: {
-  //     tenantId: tenant().tenantId
-  //     principalType: 'ServicePrincipal'
-  //     principalName: cmsUamiName
-  //   }
-  // }
 
   resource allowAllWindowsAzureIps 'firewallRules' = {
     name: 'AllowAllWindowsAzureIps'

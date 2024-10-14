@@ -1,16 +1,28 @@
 targetScope = 'subscription'
 
 param location string = 'westeurope'
+param environment string = 'preview'
 
 var sharedValues = json(loadTextContent('shared-values.json'))
+var environmentShort = environment == 'preview' ? 'prv' : 'prd'
 var subscriptionId = sharedValues.subscriptionIds.common
 var acrResourceGroupName = sharedValues.resources.acr.resourceGroupName
-var defaultCmsName = 'xprtzbv-cms'
-var resourceGroupName = 'rg-xprtzbv-website'
+var defaultName = 'xprtzbv-cms'
+var resourceGroupName = 'rg-${defaultName}'
+var keyVaultName = 'kv-${defaultName}-${environmentShort}'
 
 resource resourceGroup 'Microsoft.Resources/resourceGroups@2021-04-01' = {
   name: resourceGroupName
   location: location
+}
+
+module logAnalyticsWorkspace 'modules/monitoring.bicep' = {
+  scope: resourceGroup
+  name: 'Deploy-LogAnalyticsWorkspace'
+  params: {
+    location: location
+    defaultName: defaultName
+  }
 }
 
 module userManagedIdentity 'modules/user-managed-identity.bicep' = {
@@ -30,30 +42,21 @@ module acrAndRoleAssignment 'modules/roleassignments.bicep' = {
   }
 }
 
-module appServicePlan 'modules/app-service-plan.bicep' = {
+module keyVault 'modules/key-vault.bicep' = {
   scope: resourceGroup
-  name: 'Deploy-AppServicePlan'
+  name: 'Deploy-KeyVault'
   params: {
-    defaultName: defaultCmsName
     location: location
+    keyVaultName: keyVaultName
+    containerAppUserAssignedIdentityPrincipalIds: [userManagedIdentity.outputs.containerAppIdentityPrincipalId]
   }
 }
 
-module appInsights 'modules/app-insights.bicep' = {
+module containerAppEnvironment 'modules/container-app-environment.bicep' = {
   scope: resourceGroup
-  name: 'Deploy-AppInsights'
+  name: 'Deploy-Container-App-Environment'
   params: {
-    defaultName: defaultCmsName
     location: location
-
-  }
-}
-
-module frontDoor 'modules/front-door-profile.bicep' = {
-  scope: resourceGroup
-  name: 'Deploy-Front-Door-Profile'
-  params: {
-    frontDoorSkuName: 'Standard_AzureFrontDoor'
-    logAnalyticsWorkspaceName: appInsights.outputs.logAnalyticsWorkspaceName
+    logAnalyticsWorkspaceName: logAnalyticsWorkspace.outputs.logAnalyticsWorkspaceName
   }
 }

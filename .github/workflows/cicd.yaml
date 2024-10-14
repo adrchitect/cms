@@ -48,29 +48,5 @@ jobs:
           region: westeurope
           subscriptionId: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
           template: ./deploy/main.bicep
-          parameters: postgresAdministratorLogin=${{ secrets.POSTGRES_ADMINISTRATORLOGIN }} postgresAdministratorLoginPassword=${{ secrets.POSTGRES_ADMINISTRATORLOGIN_PASSWORD }}
+          parameters: environment=preview
           failOnStdErr: false
-
-      - name: Set up Node.js version
-        uses: actions/setup-node@v3
-        with:
-          node-version: '20.x'
-
-      - name: npm install, build, and test
-        run: |
-          npm install
-          npm run build --if-present
-
-      - name: zip code
-        run: |
-          zip -r strapi.zip .
-
-      - name: 'Deploy to Azure Web App'
-        uses: azure/webapps-deploy@v2
-        with:
-          app-name: 'app-xprtzbv-cms'
-          package: strapi.zip
-
-      - name: logout
-        run: |
-          az logout

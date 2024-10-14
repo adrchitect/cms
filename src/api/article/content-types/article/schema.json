@@ -32,6 +32,16 @@
     "description": {
       "type": "string",
       "required": true
+    },
+    "site": {
+      "type": "enumeration",
+      "enum": [
+        "XPRTZ",
+        "XPRTZ TOO",
+        "XPRTZ Cloud"
+      ],
+      "required": true,
+      "default": "XPRTZ"
     }
   }
 }

@@ -2,7 +2,7 @@ param location string
 
 resource containerAppIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' = {
   location: location
-  name: 'id-xprtzbv-website'
+  name: 'id-xprtzbv-cms'
 }
 
 output containerAppIdentityPrincipalId string = containerAppIdentity.properties.principalId

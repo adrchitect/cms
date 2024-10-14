@@ -2,7 +2,7 @@ param defaultName string
 param location string
 
 resource logAnalyticsWorkspace 'Microsoft.OperationalInsights/workspaces@2020-08-01' = {
-  name: 'law-${defaultName}'
+  name: 'log-${defaultName}'
   location: location
   properties: {
     sku: {

@@ -32,6 +32,22 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: "Login to ACR"
+        run: |
+          set -euo pipefail
+          access_token=$(az account get-access-token --query accessToken -o tsv)
+          refresh_token=$(curl https://${{ secrets.REGISTRY_NAME }}.azurecr.io/oauth2/exchange -v -d "grant_type=access_token&service=${{ secrets.REGISTRY_NAME }}.azurecr.io&access_token=$access_token" | jq -r .refresh_token)
+          docker login -u 00000000-0000-0000-0000-000000000000 --password-stdin ${{ secrets.REGISTRY_NAME }}.azurecr.io <<< "$refresh_token"
+
+      - name: Build and push container image
+        uses: docker/build-push-action@v5
+        with:
+          push: true
+          tags: ${{ secrets.REGISTRY_NAME }}.azurecr.io/cms:${{ env.GITHUB_REF_NAME_SLUG }}
+          file: ./Dockerfile.prod
+          build-args: |
+            NODE_ENV=production
+
       - name: Deploy cms
         uses: azure/arm-deploy@v2
         with:
@@ -39,30 +55,10 @@ jobs:
           region: westeurope
           subscriptionId: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
           template: ./deploy/main.bicep
-          parameters: applicationTag=${{ env.GITHUB_REF_NAME_SLUG }} postgresAdministratorLogin=${{ secrets.POSTGRES_ADMINISTRATORLOGIN }} postgresAdministratorLoginPassword=${{ secrets.POSTGRES_ADMINISTRATORLOGIN_PASSWORD }}
+          parameters: environment=preview imageTag=${{ env.GITHUB_REF_NAME_SLUG }}
           failOnStdErr: false
 
-      - name: Set up Node.js version
-        uses: actions/setup-node@v3
-        with:
-          node-version: '20.x'
-
-      - name: npm install, build, and test
-        run: |
-          npm install
-          npm run build --if-present
-
-      - name: zip code
-        run: |
-          zip -r strapi.zip .
-
-      - name: 'Deploy to Azure Web App'
-        uses: azure/webapps-deploy@v2
-        with:
-          app-name: 'app-xprtzbv-cms-${{ env.GITHUB_REF_NAME_SLUG }}'
-          package: strapi.zip
-
-      - name: logout
+      - name: Logout
         run: |
           az logout
 
@@ -89,8 +85,9 @@ jobs:
         with:
           azcliversion: latest
           inlineScript: |
-            az webapp delete -g rg-xprtzbv-website -n app-xprtzbv-cms-${{ env.GITHUB_REF_NAME_SLUG }}
+            az containerapp delete -g rg-xprtzbv-cms -n ctap-xprtzbv-cms-${{ env.GITHUB_REF_NAME_SLUG }} -y
+            az containerapp delete -g rg-xprtzbv-cms -n psql-xprtzbv-cms-${{ env.GITHUB_REF_NAME_SLUG }} -y
 
-      - name: logout
+      - name: Logout
         run: |
           az logout
