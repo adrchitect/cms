@@ -27,10 +27,10 @@ jobs:
         with:
           azcliversion: latest
           inlineScript: |
-            export POSTGRES-ADMIN-PASSWORD=$(az keyvault secret show --name POSTGRES-ADMIN-PASSWORD --vault-name kv-xprtzbv-cms-prv | jq -r .value)
-            export POSTGRES-STRAPI-PASSWORD=$(az keyvault secret show --name POSTGRES-STRAPI-PASSWORD --vault-name kv-xprtzbv-cms-prv | jq -r .value)
-            echo cmsadmin_password=$POSTGRES-ADMIN-PASSWORD >> "$GITHUB_ENV"
-            echo strapi_password=$POSTGRES-STRAPI-PASSWORD >> "$GITHUB_ENV"
+            export ADMINPASSWORD=$(az keyvault secret show --name POSTGRES-ADMIN-PASSWORD --vault-name kv-xprtzbv-cms-prv | jq -r .value)
+            export STRAPIPASSWORD=$(az keyvault secret show --name POSTGRES-STRAPI-PASSWORD --vault-name kv-xprtzbv-cms-prv | jq -r .value)
+            echo cmsadmin_password=$ADMINPASSWORD >> "$GITHUB_ENV"
+            echo strapi_password=$STRAPIPASSWORD >> "$GITHUB_ENV"
 
       - name: Enable Postgres service
         run: |
