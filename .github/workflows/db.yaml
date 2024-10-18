@@ -39,4 +39,4 @@ jobs:
 
       - name: Create Postgres user and schema
         run: |
-          sudo -u postgres psql -U cmsadmin -h ${{env.SERVER}} -c 'CREATE USER maarten PASSWORD $strapi_password;'
+          sudo -u postgres psql -d 'postgresql://cmsadmin:$cmsadmin_password@${{env.SERVER}}' -c 'CREATE USER maarten PASSWORD $strapi_password;'
