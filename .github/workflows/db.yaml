@@ -11,7 +11,7 @@ env:
   SERVER: 'pgsql-xprtzbv-cms-bicep.postgres.database.azure.com'
 jobs:
   db:
-    runs-on: ubuntu-24:04
+    runs-on: ubuntu-latest
     environment: preview
     name: Database
     steps:
