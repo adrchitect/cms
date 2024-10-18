@@ -12,6 +12,8 @@ resource keyVault 'Microsoft.KeyVault/vaults@2022-07-01' = {
     }
     tenantId: tenant().tenantId
     enabledForDeployment: true
+    enabledForTemplateDeployment: true
+    enabledForDiskEncryption: true
     enableRbacAuthorization: true
     enablePurgeProtection: true
     enableSoftDelete: true
@@ -20,13 +22,15 @@ resource keyVault 'Microsoft.KeyVault/vaults@2022-07-01' = {
 
 var keyVaultSecretsUser = loadJsonContent('../buildin-roles.json').keyVault.secretsUser
 
-resource keyVaultSecretUsers 'Microsoft.Authorization/roleAssignments@2022-04-01' = [for id in containerAppUserAssignedIdentityPrincipalIds: {
-  scope: keyVault
-  name: guid(id, keyVault.id, keyVaultSecretsUser)
-  properties: {
-    principalId: id
-    roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', keyVaultSecretsUser)
+resource keyVaultSecretUsers 'Microsoft.Authorization/roleAssignments@2022-04-01' = [
+  for id in containerAppUserAssignedIdentityPrincipalIds: {
+    scope: keyVault
+    name: guid(id, keyVault.id, keyVaultSecretsUser)
+    properties: {
+      principalId: id
+      roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', keyVaultSecretsUser)
+    }
   }
-}]
+]
 
 output keyVaultName string = keyVault.name

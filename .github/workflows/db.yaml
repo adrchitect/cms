@@ -1,0 +1,42 @@
+name: DB workflow
+run-name: ${{ github.actor }} is setting up the database for the cms
+
+on:
+  workflow_dispatch:
+
+permissions:
+      id-token: write
+      contents: read
+env:
+  SERVER: 'pgsql-xprtzbv-cms-bicep.postgres.database.azure.com'
+jobs:
+  db:
+    runs-on: ubuntu-24:04
+    environment: preview
+    name: Database
+    steps:
+      - name: Azure login
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Retrieve passwords from the Keyvault
+        uses: azure/CLI@v2
+        with:
+          azcliversion: latest
+          inlineScript: |
+            export POSTGRES-ADMIN-PASSWORD=$(az keyvault secret show --name POSTGRES-ADMIN-PASSWORD --vault-name kv-xprtzbv-cms-prv | jq -r .value)
+            export POSTGRES-STRAPI-PASSWORD=$(az keyvault secret show --name POSTGRES-STRAPI-PASSWORD --vault-name kv-xprtzbv-cms-prv | jq -r .value)
+            echo cmsadmin_password=$POSTGRES-ADMIN-PASSWORD >> "$GITHUB_ENV"
+            echo strapi_password=$POSTGRES-STRAPI-PASSWORD >> "$GITHUB_ENV"
+
+      - name: Enable Postgres service
+        run: |
+          sudo systemctl start postgresql.service
+          pg_isready
+
+      - name: Create Postgres user and schema
+        run: |
+          sudo -u postgres psql -U cmsadmin -h ${{env.SERVER}} -c 'CREATE USER maarten PASSWORD $strapi_password;'
