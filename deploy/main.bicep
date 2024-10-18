@@ -1,6 +1,6 @@
 targetScope = 'subscription'
 
-param location string = 'westeurope'
+param location string = 'germanywestcentral'
 param environment string = 'preview'
 param imageTag string = 'latest'
 

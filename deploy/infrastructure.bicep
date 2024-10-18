@@ -56,7 +56,7 @@ module containerAppEnvironment 'modules/container-app-environment.bicep' = {
   scope: resourceGroup
   name: 'Deploy-Container-App-Environment'
   params: {
-    location: location
+    location: 'germanywestcentral'
     logAnalyticsWorkspaceName: logAnalyticsWorkspace.outputs.logAnalyticsWorkspaceName
   }
 }
