@@ -1,19 +1,18 @@
-name: DB workflow
-run-name: ${{ github.actor }} is setting up the database for the cms
+name: Database workflow
+run-name: ${{ github.actor }} is running the database workflow
 
 on:
   workflow_dispatch:
+  push:
+    branches: [ main ]
 
 permissions:
       id-token: write
       contents: read
-env:
-  SERVER: 'pgsql-xprtzbv-cms-bicep.postgres.database.azure.com'
 jobs:
-  db:
+  Preview:
     runs-on: ubuntu-latest
     environment: preview
-    name: Database
     steps:
       - name: Azure login
         uses: azure/login@v2
@@ -22,21 +21,28 @@ jobs:
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
-      - name: Retrieve passwords from the Keyvault
+      - name: Show subscription details
         uses: azure/CLI@v2
         with:
           azcliversion: latest
           inlineScript: |
-            export ADMINPASSWORD=$(az keyvault secret show --name POSTGRES-ADMIN-PASSWORD --vault-name kv-xprtzbv-cms-prv | jq -r .value)
-            export STRAPIPASSWORD=$(az keyvault secret show --name POSTGRES-STRAPI-PASSWORD --vault-name kv-xprtzbv-cms-prv | jq -r .value)
-            echo cmsadmin_password=$ADMINPASSWORD >> "$GITHUB_ENV"
-            echo strapi_password=$STRAPIPASSWORD >> "$GITHUB_ENV"
+            az account show
 
-      - name: Enable Postgres service
-        run: |
-          sudo systemctl start postgresql.service
-          pg_isready
+      - uses: actions/checkout@main
+        with:
+          fetch-depth: 0
 
-      - name: Create Postgres user and schema
+      - name: "Login to ACR"
         run: |
-          sudo -u postgres psql -d 'postgresql://cmsadmin:$cmsadmin_password@${{env.SERVER}}' -c 'CREATE USER maarten PASSWORD $strapi_password;'
+          set -euo pipefail
+          access_token=$(az account get-access-token --query accessToken -o tsv)
+          refresh_token=$(curl https://${{ secrets.REGISTRY_NAME }}.azurecr.io/oauth2/exchange -v -d "grant_type=access_token&service=${{ secrets.REGISTRY_NAME }}.azurecr.io&access_token=$access_token" | jq -r .refresh_token)
+          docker login -u 00000000-0000-0000-0000-000000000000 --password-stdin ${{ secrets.REGISTRY_NAME }}.azurecr.io <<< "$refresh_token"
+
+      - name: Build and push Strapi init container image
+        uses: docker/build-push-action@v5
+        with:
+          push: true
+          tags: ${{ secrets.REGISTRY_NAME }}.azurecr.io/cms/init:latest
+          file: ./Dockerfile.database
+

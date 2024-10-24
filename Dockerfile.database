@@ -1,0 +1,8 @@
+FROM alpine
+RUN apk update && apk add --no-cache postgresql16-client
+
+WORKDIR /database/
+COPY ./deploy/scripts/database-init.sh .
+RUN chmod +x database-init.sh
+
+CMD ["./database-init.sh"]
