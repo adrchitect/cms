@@ -9,6 +9,7 @@ var defaultName = 'xprtzbv-cms'
 var resourceGroupName = 'rg-${defaultName}'
 var containerAppIdentityName = 'id-${defaultName}'
 var keyVaultName = 'kv-${defaultName}-${environmentShort}'
+var databaseServerName = 'pgsql-xprtzbv-cms'
 
 resource resourceGroup 'Microsoft.Resources/resourceGroups@2021-04-01' existing = {
   name: resourceGroupName
@@ -19,7 +20,7 @@ resource containerAppIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@
   name: containerAppIdentityName
 }
 
-module containerAppCms 'modules/container-app-cms.bicep' = {
+module containerAppCms 'modules/container-app-cms.bicep' = if (imageTag != 'latest') {
   scope: resourceGroup
   name: 'Deploy-Container-App-Cms'
   params: {
@@ -27,6 +28,19 @@ module containerAppCms 'modules/container-app-cms.bicep' = {
     keyVaultName: keyVaultName
     containerAppUserAssignedIdentityResourceId: containerAppIdentity.id
     containerAppUserAssignedIdentityClientId: containerAppIdentity.properties.clientId
+    imageTag: imageTag
+  }
+}
+
+module containerAppCmsCi 'modules/container-app-cms-ci.bicep' = if (imageTag == 'latest') {
+  scope: resourceGroup
+  name: 'Deploy-Container-App-Cms-Ci'
+  params: {
+    location: location
+    keyVaultName: keyVaultName
+    containerAppUserAssignedIdentityResourceId: containerAppIdentity.id
+    containerAppUserAssignedIdentityClientId: containerAppIdentity.properties.clientId
+    databaseServerName: databaseServerName
     imageTag: imageTag
   }
 }

@@ -1,11 +1,11 @@
-param resourceName string
+param databaseServerName string
 param location string
 param administratorLogin string
 @secure()
 param administratorLoginPassword string
 
 resource postgreSql 'Microsoft.DBforPostgreSQL/flexibleServers@2023-12-01-preview' = {
-  name: resourceName
+  name: databaseServerName
   location: location
   sku: {
     name: 'Standard_B1ms'
@@ -42,15 +42,6 @@ resource postgreSql 'Microsoft.DBforPostgreSQL/flexibleServers@2023-12-01-previe
   resource databases 'databases' = {
     name: 'strapi'
   }
-
-  // resource allowEntraAdministrator 'administrators' = {
-  //   name: '65fd5191-ffff-413f-a218-da4552a4d13f'
-  //   properties: {
-  //     principalName: 'All Developers'
-  //     principalType: 'Group'
-  //     tenantId: '2a600bfa-5bb2-40e6-b33b-12bf8b7fa696'
-  //   }
-  // }
 
   resource allowAllWindowsAzureIps 'firewallRules' = {
     name: 'AllowAllAzureServicesAndResourcesWithinAzureIps'

@@ -3,9 +3,7 @@ run-name: ${{ github.actor }} is running the database workflow
 
 on:
   workflow_dispatch:
-  push:
-    branches: [ main ]
-
+    
 permissions:
       id-token: write
       contents: read
