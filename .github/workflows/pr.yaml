@@ -58,10 +58,6 @@ jobs:
           parameters: environment=preview imageTag=${{ env.GITHUB_REF_NAME_SLUG }}
           failOnStdErr: false
 
-      - name: Logout
-        run: |
-          az logout
-
   remove_webapp:
     runs-on: ubuntu-latest
     environment: preview
@@ -87,7 +83,4 @@ jobs:
           inlineScript: |
             az containerapp delete -g rg-xprtzbv-cms -n ctap-xprtzbv-cms-${{ env.GITHUB_REF_NAME_SLUG }} -y
             az containerapp delete -g rg-xprtzbv-cms -n psql-xprtzbv-cms-${{ env.GITHUB_REF_NAME_SLUG }} -y
-
-      - name: Logout
-        run: |
-          az logout
+            az acr repository delete --name xprtzbv --image cms:${{ env.GITHUB_REF_NAME_SLUG }} -y
