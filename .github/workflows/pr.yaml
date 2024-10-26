@@ -7,8 +7,8 @@ on:
     types: [opened, synchronize, reopened, closed]
 
 permissions:
-      id-token: write
-      contents: read
+  id-token: write
+  contents: read
 jobs:
   ci:
     runs-on: ubuntu-latest
@@ -83,4 +83,3 @@ jobs:
           inlineScript: |
             az containerapp delete -g rg-xprtzbv-cms -n ctap-xprtzbv-cms-${{ env.GITHUB_REF_NAME_SLUG }} -y
             az containerapp delete -g rg-xprtzbv-cms -n psql-xprtzbv-cms-${{ env.GITHUB_REF_NAME_SLUG }} -y
-            az acr repository delete --name xprtzbv --image cms:${{ env.GITHUB_REF_NAME_SLUG }} -y
