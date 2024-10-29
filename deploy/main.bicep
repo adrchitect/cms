@@ -9,7 +9,7 @@ var defaultName = 'xprtzbv-cms'
 var resourceGroupName = 'rg-${defaultName}'
 var containerAppIdentityName = 'id-${defaultName}'
 var keyVaultName = 'kv-${defaultName}-${environmentShort}'
-var databaseServerName = 'pgsql-xprtzbv-cms'
+var databaseServerName = 'pgsql-xprtzbv-cms-${environmentShort}'
 
 resource resourceGroup 'Microsoft.Resources/resourceGroups@2021-04-01' existing = {
   name: resourceGroupName
