@@ -20,7 +20,7 @@ resource containerAppIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@
   name: containerAppIdentityName
 }
 
-module containerAppCms 'modules/container-app-cms.bicep' = if (imageTag != 'latest') {
+module containerAppCms 'modules/container-app-cms.bicep' = if (environment == 'preview') {
   scope: resourceGroup
   name: 'Deploy-Container-App-Cms'
   params: {
@@ -32,9 +32,9 @@ module containerAppCms 'modules/container-app-cms.bicep' = if (imageTag != 'late
   }
 }
 
-module containerAppCmsCi 'modules/container-app-cms-ci.bicep' = if (imageTag == 'latest') {
+module containerAppCmsCi 'modules/container-app-cms-prod.bicep' = if (environment == 'production') {
   scope: resourceGroup
-  name: 'Deploy-Container-App-Cms-Ci'
+  name: 'Deploy-Container-App-Cms-Prod'
   params: {
     location: location
     keyVaultName: keyVaultName

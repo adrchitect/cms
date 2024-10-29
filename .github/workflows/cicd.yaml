@@ -3,16 +3,17 @@ run-name: ${{ github.actor }} is deploying the cms
 
 on:
   workflow_dispatch:
-  push:
-    branches: [ main ]
+  # push:
+  #   branches: [ main ]
 
 permissions:
       id-token: write
       contents: read
+      issues: write
 jobs:
-  Preview:
+  Production:
     runs-on: ubuntu-latest
-    environment: preview
+    environment: production
     steps:
       - name: Azure login
         uses: azure/login@v2
@@ -52,19 +53,29 @@ jobs:
         uses: azure/arm-deploy@v2
         with:
           scope: subscription
-          region: westeurope
+          region: germanywestcentral
           subscriptionId: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
           template: ./deploy/infrastructure.bicep
-          parameters: environment=preview
+          parameters: environment=production
+          failOnStdErr: false
+
+      - name: Deploy database
+        uses: azure/arm-deploy@v2
+        with:
+          scope: subscription
+          region: germanywestcentral
+          subscriptionId: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          template: ./deploy/database.bicep
+          parameters: environment=production
           failOnStdErr: false
 
       - name: Deploy cms
         uses: azure/arm-deploy@v2
         with:
           scope: subscription
-          region: westeurope
+          region: germanywestcentral
           subscriptionId: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
           template: ./deploy/main.bicep
-          parameters: environment=preview
+          parameters: environment=production
           failOnStdErr: false
 

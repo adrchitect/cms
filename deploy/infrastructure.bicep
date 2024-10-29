@@ -3,7 +3,6 @@ targetScope = 'subscription'
 param location string = 'westeurope'
 param alternateLocation string = 'germanywestcentral'
 param environment string = 'preview'
-param imageTag string = 'latest'
 
 var sharedValues = json(loadTextContent('shared-values.json'))
 var environmentShort = environment == 'preview' ? 'prv' : 'prd'
@@ -12,8 +11,6 @@ var acrResourceGroupName = sharedValues.resources.acr.resourceGroupName
 var defaultName = 'xprtzbv-cms'
 var resourceGroupName = 'rg-${defaultName}'
 var keyVaultName = 'kv-${defaultName}-${environmentShort}'
-var administratorLogin = 'cmsAdmin'
-var databaseServerName = 'pgsql-xprtzbv-cms'
 
 resource resourceGroup 'Microsoft.Resources/resourceGroups@2021-04-01' = {
   name: resourceGroupName
@@ -54,25 +51,6 @@ module keyVault 'modules/key-vault.bicep' = {
     keyVaultName: keyVaultName
     containerAppUserAssignedIdentityPrincipalIds: [userManagedIdentity.outputs.containerAppIdentityPrincipalId]
   }
-}
-
-resource keyVaultRef 'Microsoft.KeyVault/vaults@2022-07-01' existing = {
-  name: keyVaultName
-  scope: resourceGroup
-}
-
-module postgresServer 'modules/postgresql.bicep' = if(imageTag == 'latest') {
-  name: 'DeployPostgresql'
-  scope: resourceGroup
-  params: {
-    location: alternateLocation
-    administratorLogin: administratorLogin
-    administratorLoginPassword: keyVaultRef.getSecret('POSTGRES-ADMIN-PASSWORD')
-    databaseServerName: databaseServerName
-  }
-  dependsOn: [
-    keyVault, keyVaultRef
-  ]
 }
 
 module containerAppEnvironment 'modules/container-app-environment.bicep' = {
