@@ -1,6 +1,6 @@
 targetScope = 'subscription'
 
-param location string = 'germanywestcentral'
+param alternateLocation string = 'germanywestcentral'
 param environment string = 'preview'
 
 var environmentShort = environment == 'preview' ? 'prv' : 'prd'
@@ -23,7 +23,7 @@ module postgresServer 'modules/postgresql.bicep' = if(environment == 'production
   name: 'Deploy-Postgresql'
   scope: resourceGroup
   params: {
-    location: location
+    location: alternateLocation
     administratorLogin: administratorLogin
     administratorLoginPassword: keyVaultRef.getSecret('POSTGRES-ADMIN-PASSWORD')
     databaseServerName: databaseServerName

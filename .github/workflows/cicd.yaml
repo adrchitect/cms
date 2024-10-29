@@ -53,7 +53,7 @@ jobs:
         uses: azure/arm-deploy@v2
         with:
           scope: subscription
-          region: germanywestcentral
+          region: westeurope
           subscriptionId: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
           template: ./deploy/infrastructure.bicep
           parameters: environment=production
@@ -63,7 +63,7 @@ jobs:
         uses: azure/arm-deploy@v2
         with:
           scope: subscription
-          region: germanywestcentral
+          region: westeurope
           subscriptionId: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
           template: ./deploy/database.bicep
           parameters: environment=production
@@ -73,7 +73,7 @@ jobs:
         uses: azure/arm-deploy@v2
         with:
           scope: subscription
-          region: germanywestcentral
+          region: westeurope
           subscriptionId: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
           template: ./deploy/main.bicep
           parameters: environment=production
