@@ -161,7 +161,7 @@ resource containerApp 'Microsoft.App/containerApps@2023-08-01-preview' = {
           name: 'database-init'
           image: initImageName
           resources: {
-            cpu: '0.25'
+            cpu: json('0.25')
             memory: '0.5Gi'
           }
           env: [

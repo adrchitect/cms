@@ -7,7 +7,7 @@ var environmentShort = environment == 'preview' ? 'prv' : 'prd'
 var defaultName = 'xprtzbv-cms'
 var resourceGroupName = 'rg-${defaultName}'
 var keyVaultName = 'kv-${defaultName}-${environmentShort}'
-var administratorLogin = 'cmsAdmin'
+var administratorLogin = 'cmsadmin'
 var databaseServerName = 'pgsql-xprtzbv-cms-${environmentShort}'
 
 resource resourceGroup 'Microsoft.Resources/resourceGroups@2021-04-01' existing = {
@@ -19,7 +19,7 @@ resource keyVaultRef 'Microsoft.KeyVault/vaults@2022-07-01' existing = {
   scope: resourceGroup
 }
 
-module postgresServer 'modules/postgresql.bicep' = if(environment == 'production') {
+module postgresServer 'modules/postgresql.bicep' = if (environment == 'production') {
   name: 'Deploy-Postgresql'
   scope: resourceGroup
   params: {
@@ -29,4 +29,3 @@ module postgresServer 'modules/postgresql.bicep' = if(environment == 'production
     databaseServerName: databaseServerName
   }
 }
-
