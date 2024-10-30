@@ -9,6 +9,7 @@ on:
 permissions:
   id-token: write
   contents: read
+  pull-requests: write
 jobs:
   ci:
     runs-on: ubuntu-latest
@@ -59,6 +60,7 @@ jobs:
           failOnStdErr: false
 
       - name: Deploy cms
+        id: deployCms
         uses: azure/arm-deploy@v2
         with:
           scope: subscription
@@ -67,6 +69,23 @@ jobs:
           template: ./deploy/main.bicep
           parameters: environment=preview imageTag=${{ env.GITHUB_REF_NAME_SLUG }}
           failOnStdErr: false
+
+      - name: Comment CMS FQDN on Pull Requests
+        uses: actions/github-script@v7
+        if: github.event_name == 'pull_request'
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: `# Preview environment URL
+
+              ## Strapi
+
+              [URL](https://${{ steps.deployCms.outputs.cmsFqdn }})
+              `
+            })
 
   remove_webapp:
     runs-on: ubuntu-latest

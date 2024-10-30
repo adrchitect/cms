@@ -44,3 +44,7 @@ module containerAppCmsCi 'modules/container-app-cms-prod.bicep' = if (environmen
     imageTag: imageTag
   }
 }
+
+output cmsFqdn string = environment == 'preview'
+  ? containerAppCms.outputs.containerAppUrl
+  : containerAppCmsCi.outputs.containerAppUrl
