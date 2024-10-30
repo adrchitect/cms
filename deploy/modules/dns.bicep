@@ -1,33 +1,32 @@
-param frontDoorEndpointHostName string
-param cnameRecordName string
-param cnameValidation string
+param origin string
+param rootDomain string
+param subDomain string
+param validationToken string
 
-var dnsZoneName = 'xprtz.dev'
-
-resource dnsZone 'Microsoft.Network/dnsZones@2023-07-01-preview' existing = {
-  name: dnsZoneName
+resource dnsZone 'Microsoft.Network/dnsZones@2018-05-01' existing = {
+  name: rootDomain
 }
 
-resource cnameRecord 'Microsoft.Network/dnsZones/CNAME@2023-07-01-preview' = {
+resource cnameRecord 'Microsoft.Network/dnsZones/CNAME@2018-05-01' = {
   parent: dnsZone
-  name: cnameRecordName
+  name: subDomain
   properties: {
     TTL: 3600
     CNAMERecord: {
-      cname: frontDoorEndpointHostName
+      cname: origin
     }
   }
 }
 
-resource validationTxtRecordForCname 'Microsoft.Network/dnsZones/TXT@2018-05-01' = {
+resource validationTxtRecord 'Microsoft.Network/dnsZones/TXT@2018-05-01' = {
   parent: dnsZone
-  name: '_dnsauth.${cnameRecordName}'
+  name: '_dnsauth.${subDomain}'
   properties: {
     TTL: 3600
     TXTRecords: [
       {
         value: [
-          cnameValidation
+          validationToken
         ]
       }
     ]

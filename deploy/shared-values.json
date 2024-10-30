@@ -7,5 +7,9 @@
       "name": "xprtzbv",
       "resourceGroupName": "rg-xprtzbv-acr"
     }
+  },
+  "resourceGroups": {
+    "infrastructure": "rg-xprtzbv-infrastructure",
+    "management": "xprtz-mgmt"
   }
 }
