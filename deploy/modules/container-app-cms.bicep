@@ -78,6 +78,16 @@ resource containerApp 'Microsoft.App/containerApps@2023-08-01-preview' = {
           keyVaultUrl: toLower('${keyVault.properties.vaultUri}secrets/JWT-SECRET')
           identity: containerAppUserAssignedIdentityResourceId
         }
+        {
+          name: toLower('REF-AZURE-ACS-ENDPOINT')
+          keyVaultUrl: toLower('${keyVault.properties.vaultUri}secrets/AZURE-ACS-ENDPOINT')
+          identity: containerAppUserAssignedIdentityResourceId
+        }
+        {
+          name: toLower('REF-AZURE-ACS-FALLBACK-EMAIL')
+          keyVaultUrl: toLower('${keyVault.properties.vaultUri}secrets/AZURE-ACS-FALLBACK-EMAIL')
+          identity: containerAppUserAssignedIdentityResourceId
+        }
       ]
     }
     template: {
@@ -126,6 +136,14 @@ resource containerApp 'Microsoft.App/containerApps@2023-08-01-preview' = {
             {
               name: 'JWT_SECRET'
               secretRef: toLower('REF-JWT-SECRET')
+            }
+            {
+              name: 'AZURE_ENDPOINT'
+              secretRef: toLower('REF-AZURE-ACS-ENDPOINT')
+            }
+            {
+              name: 'FALLBACK_EMAIL'
+              secretRef: toLower('REF-AZURE-ACS-FALLBACK-EMAIL')
             }
           ]
         }

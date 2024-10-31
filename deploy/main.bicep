@@ -31,19 +31,7 @@ resource containerAppIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@
   name: containerAppIdentityName
 }
 
-module containerAppCms 'modules/container-app-cms.bicep' = if (environment == 'preview') {
-  scope: resourceGroup
-  name: 'Deploy-Container-App-Cms'
-  params: {
-    location: location
-    keyVaultName: keyVaultName
-    containerAppUserAssignedIdentityResourceId: containerAppIdentity.id
-    containerAppUserAssignedIdentityClientId: containerAppIdentity.properties.clientId
-    imageTag: imageTag
-  }
-}
-
-module containerAppCmsProd 'modules/container-app-cms-prod.bicep' = if (environment == 'production') {
+module containerAppCmsProd 'modules/container-app-cms-prod.bicep' = {
   scope: resourceGroup
   name: 'Deploy-Container-App-Cms-Prod'
   params: {
@@ -56,7 +44,7 @@ module containerAppCmsProd 'modules/container-app-cms-prod.bicep' = if (environm
   }
 }
 
-module frontdoorSettings 'modules/frontdoor.bicep' = if (environment == 'production') {
+module frontdoorSettings 'modules/frontdoor.bicep' = {
   scope: infrastructureResourceGroup
   name: 'Deploy-Frontdoor-Settings'
   params: {
@@ -68,7 +56,7 @@ module frontdoorSettings 'modules/frontdoor.bicep' = if (environment == 'product
   }
 }
 
-module dns 'modules/dns.bicep' = if (environment == 'production') {
+module dns 'modules/dns.bicep' = {
   scope: managementResourceGroup
   name: 'Deploy-Dns'
   params: {
@@ -78,7 +66,3 @@ module dns 'modules/dns.bicep' = if (environment == 'production') {
     validationToken: frontdoorSettings.outputs.frontDoorCustomDomainValidationToken
   }
 }
-
-output cmsFqdn string = environment == 'preview'
-  ? containerAppCms.outputs.containerAppUrl
-  : containerAppCmsProd.outputs.containerAppUrl
