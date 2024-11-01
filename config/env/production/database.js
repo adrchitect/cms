@@ -7,7 +7,7 @@ module.exports = ({ env }) => ({
       database: env('DATABASE_NAME', env('POSTGRES_DATABASE')),
       user: env('DATABASE_USERNAME', env('POSTGRES_USERNAME')),
       password: env('DATABASE_PASSWORD', env('POSTGRES_PASSWORD')),
-      ssl: env.bool('DATABASE_SSL', false)
-    }
-  }
+      ssl: env.bool('DATABASE_SSL', false),
+    },
+  },
 });

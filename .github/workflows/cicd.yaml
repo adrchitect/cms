@@ -4,12 +4,12 @@ run-name: ${{ github.actor }} is deploying the cms
 on:
   workflow_dispatch:
   push:
-    branches: [ main ]
+    branches: [main]
 
 permissions:
-      id-token: write
-      contents: read
-      issues: write
+  id-token: write
+  contents: read
+  issues: write
 jobs:
   Production:
     runs-on: ubuntu-latest
@@ -33,7 +33,7 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: "Login to ACR"
+      - name: 'Login to ACR'
         run: |
           set -euo pipefail
           access_token=$(az account get-access-token --query accessToken -o tsv)
@@ -78,4 +78,3 @@ jobs:
           template: ./deploy/main.bicep
           parameters: environment=production
           failOnStdErr: false
-

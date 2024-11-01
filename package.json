@@ -7,9 +7,13 @@
     "develop": "strapi develop",
     "start": "strapi start",
     "build": "strapi build",
-    "strapi": "strapi"
+    "strapi": "strapi",
+    "format": "prettier . --write",
+    "postinstall": "yarn format"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "prettier": "^3.3.3"
+  },
   "dependencies": {
     "@physer/strapi-provider-upload-azure-storage": "^3.4.1",
     "@strapi/plugin-cloud": "5.1.1",

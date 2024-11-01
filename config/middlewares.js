@@ -1,27 +1,27 @@
 module.exports = [
-  "strapi::logger",
-  "strapi::errors",
+  'strapi::logger',
+  'strapi::errors',
   {
-    name: "strapi::security",
+    name: 'strapi::security',
     config: {
       contentSecurityPolicy: {
         useDefaults: true,
         directives: {
-          "connect-src": ["'self'", "https:"],
-          "img-src": [
+          'connect-src': ["'self'", 'https:'],
+          'img-src': [
             "'self'",
-            "data:",
-            "blob:",
-            "market-assets.strapi.io",
-            "127.0.0.1:10000",
+            'data:',
+            'blob:',
+            'market-assets.strapi.io',
+            '127.0.0.1:10000',
             `https://${process.env.STORAGE_ACCOUNT}.blob.core.windows.net`,
           ],
-          "media-src": [
+          'media-src': [
             "'self'",
-            "data:",
-            "blob:",
-            "market-assets.strapi.io",
-            "127.0.0.1:10000",
+            'data:',
+            'blob:',
+            'market-assets.strapi.io',
+            '127.0.0.1:10000',
             `https://${process.env.STORAGE_ACCOUNT}.blob.core.windows.net`,
           ],
           upgradeInsecureRequests: null,
@@ -29,11 +29,11 @@ module.exports = [
       },
     },
   },
-  "strapi::cors",
-  "strapi::poweredBy",
-  "strapi::query",
-  "strapi::body",
-  "strapi::session",
-  "strapi::favicon",
-  "strapi::public",
+  'strapi::cors',
+  'strapi::poweredBy',
+  'strapi::query',
+  'strapi::body',
+  'strapi::session',
+  'strapi::favicon',
+  'strapi::public',
 ];

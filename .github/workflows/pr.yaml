@@ -33,7 +33,7 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: "Login to ACR"
+      - name: 'Login to ACR'
         run: |
           set -euo pipefail
           access_token=$(az account get-access-token --query accessToken -o tsv)
