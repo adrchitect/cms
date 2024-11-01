@@ -5,6 +5,7 @@ param environment string = 'preview'
 param imageTag string = 'latest'
 
 var sharedValues = json(loadTextContent('shared-values.json'))
+var builtinRoles = json(loadTextContent('builtin-roles.json'))
 var environmentShort = environment == 'preview' ? 'prv' : 'prd'
 var defaultName = 'xprtzbv-cms'
 var resourceGroupName = 'rg-${defaultName}'
@@ -31,6 +32,17 @@ resource containerAppIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@
   name: containerAppIdentityName
 }
 
+module storage 'modules/storageaccount.bicep' = {
+  name: 'Deploy-Storage-Account'
+  scope: resourceGroup
+  params: {
+    app: 'cms'
+    environmentShort: environmentShort
+    blobDataContributorRoleId: builtinRoles.storageAccount.blobDataContributor
+    containerAppIdentity: containerAppIdentity.properties.principalId
+  }
+}
+
 module containerAppCmsProd 'modules/container-app-cms-prod.bicep' = {
   scope: resourceGroup
   name: 'Deploy-Container-App-Cms-Prod'
@@ -41,6 +53,7 @@ module containerAppCmsProd 'modules/container-app-cms-prod.bicep' = {
     containerAppUserAssignedIdentityClientId: containerAppIdentity.properties.clientId
     databaseServerName: databaseServerName
     imageTag: imageTag
+    storageAccountName: storage.outputs.storageAccountName
   }
 }
 

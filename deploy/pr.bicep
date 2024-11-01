@@ -4,6 +4,7 @@ param location string = 'germanywestcentral'
 param environment string = 'preview'
 param imageTag string = 'latest'
 
+var builtinRoles = json(loadTextContent('builtin-roles.json'))
 var environmentShort = environment == 'preview' ? 'prv' : 'prd'
 var defaultName = 'xprtzbv-cms'
 var resourceGroupName = 'rg-${defaultName}'
@@ -19,6 +20,17 @@ resource containerAppIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@
   name: containerAppIdentityName
 }
 
+module storage 'modules/storageaccount.bicep' = {
+  name: 'Deploy-Storage-Account'
+  scope: resourceGroup
+  params: {
+    app: 'cms'
+    environmentShort: environmentShort
+    blobDataContributorRoleId: builtinRoles.storageAccount.blobDataContributor
+    containerAppIdentity: containerAppIdentity.properties.principalId
+  }
+}
+
 module containerAppCms 'modules/container-app-cms.bicep' = if (environment == 'preview') {
   scope: resourceGroup
   name: 'Deploy-Container-App-Cms'
@@ -28,6 +40,7 @@ module containerAppCms 'modules/container-app-cms.bicep' = if (environment == 'p
     containerAppUserAssignedIdentityResourceId: containerAppIdentity.id
     containerAppUserAssignedIdentityClientId: containerAppIdentity.properties.clientId
     imageTag: imageTag
+    storageAccountName: storage.outputs.storageAccountName
   }
 }
 

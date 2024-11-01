@@ -3,7 +3,7 @@ targetScope = 'resourceGroup'
 param principalId string
 param acrName string
 
-var buildinRoles = json(loadTextContent('../buildin-roles.json'))
+var buildinRoles = json(loadTextContent('../builtin-roles.json'))
 var acrPullRoleDefinitionId = buildinRoles.acr.pull
 
 resource containerRegistry 'Microsoft.ContainerRegistry/registries@2023-11-01-preview' existing = {

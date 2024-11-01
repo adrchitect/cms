@@ -10,6 +10,7 @@ var acrServer = 'xprtzbv.azurecr.io'
 var imageName = '${acrServer}/cms:${imageTag}'
 var initImageName = '${acrServer}/cms/init:${imageTag}'
 var administratorLogin = 'cmsadmin'
+param storageAccountName string
 
 resource keyVault 'Microsoft.KeyVault/vaults@2022-07-01' existing = {
   name: keyVaultName
@@ -170,6 +171,30 @@ resource containerApp 'Microsoft.App/containerApps@2023-08-01-preview' = {
             {
               name: 'FALLBACK_EMAIL'
               secretRef: toLower('REF-AZURE-ACS-FALLBACK-EMAIL')
+            }
+            {
+              name: 'STORAGE_AUTH_TYPE'
+              value: 'msi'
+            }
+            {
+              name: 'STORAGE_AZURE_CLIENT_ID'
+              value: containerAppUserAssignedIdentityClientId
+            }
+            {
+              name: 'STORAGE_ACCOUNT'
+              value: storageAccountName
+            }
+            {
+              name: 'STORAGE_CREATE_CONTAINER_IF_NOT_EXIST'
+              value: 'true'
+            }
+            {
+              name: 'STORAGE_CONTAINER_NAME'
+              value: 'media'
+            }
+            {
+              name: 'STORAGE_PUBLIC_ACCESS_TYPE'
+              value: 'container'
             }
           ]
         }
