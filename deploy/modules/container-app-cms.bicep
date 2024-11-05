@@ -2,13 +2,15 @@ param location string
 param keyVaultName string
 param containerAppUserAssignedIdentityResourceId string
 param containerAppUserAssignedIdentityClientId string
-param imageTag string = 'latest'
 param storageAccountName string
+param imageTag string = 'latest'
+param deployTime int = dateTimeToEpoch(dateTimeAdd(utcNow(), 'P1Y'))
 
 var name = take('ctap-xprtzbv-cms-${imageTag}', 32)
 var dbName = take('psql-xprtzbv-cms-${imageTag}', 32)
 var acrServer = 'xprtzbv.azurecr.io'
 var imageName = '${acrServer}/cms:${imageTag}'
+var deployTimeInSecondsSinceEpoch = string(deployTime)
 
 resource keyVault 'Microsoft.KeyVault/vaults@2022-07-01' existing = {
   name: keyVaultName
@@ -109,6 +111,10 @@ resource containerApp 'Microsoft.App/containerApps@2023-08-01-preview' = {
             {
               name: 'AZURE_CLIENT_ID'
               value: containerAppUserAssignedIdentityClientId
+            }
+            {
+              name: 'DEPLOY_TIME_IN_SECONDS_SINCE_EPOCH'
+              value: deployTimeInSecondsSinceEpoch
             }
             {
               name: 'NODE_ENV'
