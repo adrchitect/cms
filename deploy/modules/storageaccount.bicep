@@ -17,7 +17,6 @@ param blobDataContributorRoleId string
 
 var name = take('stxprtzbv${app}${environmentShort}${uniqueString(resourceGroup().id)}', 24)
 
-
 resource storageBlobDataContributorRoleDefinition 'Microsoft.Authorization/roleDefinitions@2022-04-01' existing = {
   scope: subscription()
   name: blobDataContributorRoleId
@@ -35,7 +34,7 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2023-04-01' = {
     accessTier: 'Hot'
     allowBlobPublicAccess: true
     minimumTlsVersion: 'TLS1_2'
-    allowSharedKeyAccess: false
+    allowSharedKeyAccess: true
   }
 }
 

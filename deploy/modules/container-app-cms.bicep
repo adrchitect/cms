@@ -2,22 +2,50 @@ param location string
 param keyVaultName string
 param containerAppUserAssignedIdentityResourceId string
 param containerAppUserAssignedIdentityClientId string
-param storageAccountName string
 param imageTag string = 'latest'
 param deployTime int = dateTimeToEpoch(dateTimeAdd(utcNow(), 'P1Y'))
+param app string = 'cms'
+param environment string = 'preview'
 
+var environmentShort = environment == 'preview' ? 'prv' : 'prd'
 var name = take('ctap-xprtzbv-cms-${imageTag}', 32)
 var dbName = take('psql-xprtzbv-cms-${imageTag}', 32)
 var acrServer = 'xprtzbv.azurecr.io'
 var imageName = '${acrServer}/cms:${imageTag}'
 var deployTimeInSecondsSinceEpoch = string(deployTime)
+var storageAccountName = take('stxprtzbv${app}${environmentShort}${uniqueString(az.resourceGroup().id)}', 24)
 
 resource keyVault 'Microsoft.KeyVault/vaults@2022-07-01' existing = {
   name: keyVaultName
 }
 
+resource storageAccount 'Microsoft.Storage/storageAccounts@2023-05-01' existing = {
+  name: storageAccountName
+}
+
 resource containerAppEnvironment 'Microsoft.App/managedEnvironments@2022-11-01-preview' existing = {
   name: 'me-xprtzbv-cms'
+}
+
+resource fileServices 'Microsoft.Storage/storageAccounts/fileServices@2023-05-01' = {
+  name: 'default'
+  parent: storageAccount
+  properties: {
+    shareDeleteRetentionPolicy: {
+      days: 7
+      enabled: true
+    }
+  }
+}
+
+resource uploadFileShare 'Microsoft.Storage/storageAccounts/fileServices/shares@2023-05-01' = {
+  name: 'upload'
+  parent: fileServices
+  properties: {
+    accessTier: 'Hot'
+    enabledProtocols: 'SMB'
+    shareQuota: 102400
+  }
 }
 
 resource postgres 'Microsoft.App/containerApps@2023-04-01-preview' = {
@@ -177,6 +205,19 @@ resource containerApp 'Microsoft.App/containerApps@2023-08-01-preview' = {
               value: 'container'
             }
           ]
+          volumeMounts: [
+            {
+              mountPath: '/opt/app/public/uploads'
+              volumeName: 'upload'
+            }
+          ]
+        }
+      ]
+      volumes: [
+        {
+          name: 'upload'
+          storageName: 'upload'
+          storageType: 'AzureFile'
         }
       ]
       scale: {

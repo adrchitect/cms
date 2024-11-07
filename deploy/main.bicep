@@ -22,6 +22,7 @@ var infrastructureResourceGroup = az.resourceGroup(
 )
 var rootDomain = 'xprtz.dev'
 var frontDoorProfileName = 'afd-xprtzbv-websites'
+var app = 'cms'
 
 resource resourceGroup 'Microsoft.Resources/resourceGroups@2021-04-01' existing = {
   name: resourceGroupName
@@ -53,7 +54,8 @@ module containerAppCmsProd 'modules/container-app-cms-prod.bicep' = {
     containerAppUserAssignedIdentityClientId: containerAppIdentity.properties.clientId
     databaseServerName: databaseServerName
     imageTag: imageTag
-    storageAccountName: storage.outputs.storageAccountName
+    environment: environment
+    app: app
   }
 }
 
@@ -63,7 +65,7 @@ module frontdoorSettings 'modules/frontdoor.bicep' = {
   params: {
     frontDoorOriginHost: containerAppCmsProd.outputs.containerAppUrl
     frontDoorProfileName: frontDoorProfileName
-    application: 'cms'
+    application: app
     rootDomain: rootDomain
     subDomain: 'cms'
   }

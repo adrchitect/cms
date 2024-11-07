@@ -4,6 +4,7 @@ param location string = 'westeurope'
 param alternateLocation string = 'germanywestcentral'
 param environment string = 'preview'
 
+var builtinRoles = json(loadTextContent('builtin-roles.json'))
 var sharedValues = json(loadTextContent('shared-values.json'))
 var environmentShort = environment == 'preview' ? 'prv' : 'prd'
 var subscriptionId = sharedValues.subscriptionIds.common
@@ -34,6 +35,17 @@ module userManagedIdentity 'modules/user-managed-identity.bicep' = {
   }
 }
 
+module storage 'modules/storageaccount.bicep' = {
+  name: 'Deploy-Storage-Account'
+  scope: resourceGroup
+  params: {
+    app: 'cms'
+    environmentShort: environmentShort
+    blobDataContributorRoleId: builtinRoles.storageAccount.blobDataContributor
+    containerAppIdentity: userManagedIdentity.outputs.containerAppIdentityPrincipalId
+  }
+}
+
 module acrAndRoleAssignment 'modules/roleassignments.bicep' = {
   scope: az.resourceGroup(subscriptionId, acrResourceGroupName)
   name: 'Deploy-PullRoleAssignment'
@@ -59,5 +71,6 @@ module containerAppEnvironment 'modules/container-app-environment.bicep' = {
   params: {
     location: alternateLocation
     logAnalyticsWorkspaceName: logAnalyticsWorkspace.outputs.logAnalyticsWorkspaceName
+    storageAccountName: storage.outputs.storageAccountName
   }
 }

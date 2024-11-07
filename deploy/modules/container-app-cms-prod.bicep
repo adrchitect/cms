@@ -3,19 +3,27 @@ param keyVaultName string
 param containerAppUserAssignedIdentityResourceId string
 param containerAppUserAssignedIdentityClientId string
 param databaseServerName string
-param storageAccountName string
 param imageTag string = 'latest'
 param deployTime int = dateTimeToEpoch(dateTimeAdd(utcNow(), 'P1Y'))
+param app string = 'cms'
+param environment string = 'preview'
 
+var environmentShort = environment == 'preview' ? 'prv' : 'prd'
 var name = take('ctap-xprtzbv-cms-${imageTag}', 32)
 var acrServer = 'xprtzbv.azurecr.io'
 var imageName = '${acrServer}/cms:${imageTag}'
 var initImageName = '${acrServer}/cms/init:${imageTag}'
 var administratorLogin = 'cmsadmin'
 var deployTimeInSecondsSinceEpoch = string(deployTime)
+var storageAccountName = take('stxprtzbv${app}${environmentShort}${uniqueString(az.resourceGroup().id)}', 24)
+
 
 resource keyVault 'Microsoft.KeyVault/vaults@2022-07-01' existing = {
   name: keyVaultName
+}
+
+resource storageAccount 'Microsoft.Storage/storageAccounts@2023-05-01' existing = {
+  name: storageAccountName
 }
 
 resource containerAppEnvironment 'Microsoft.App/managedEnvironments@2022-11-01-preview' existing = {
@@ -24,6 +32,27 @@ resource containerAppEnvironment 'Microsoft.App/managedEnvironments@2022-11-01-p
 
 resource postgres 'Microsoft.DBforPostgreSQL/flexibleServers@2023-12-01-preview' existing = {
   name: databaseServerName
+}
+
+resource fileServices 'Microsoft.Storage/storageAccounts/fileServices@2023-05-01' = {
+  name: 'default'
+  parent: storageAccount
+  properties: {
+    shareDeleteRetentionPolicy: {
+      days: 7
+      enabled: true
+    }
+  }
+}
+
+resource uploadFileShare 'Microsoft.Storage/storageAccounts/fileServices/shares@2023-05-01' = {
+  name: 'upload'
+  parent: fileServices
+  properties: {
+    accessTier: 'Hot'
+    enabledProtocols: 'SMB'
+    shareQuota: 102400
+  }
 }
 
 resource containerApp 'Microsoft.App/containerApps@2023-08-01-preview' = {
@@ -203,6 +232,12 @@ resource containerApp 'Microsoft.App/containerApps@2023-08-01-preview' = {
               value: 'container'
             }
           ]
+          volumeMounts: [
+            {
+              mountPath: '/opt/app/public/uploads'
+              volumeName: 'upload'
+            }
+          ]
         }
       ]
       initContainers: [
@@ -239,6 +274,13 @@ resource containerApp 'Microsoft.App/containerApps@2023-08-01-preview' = {
               value: 'strapi'
             }
           ]
+        }
+      ]
+      volumes: [
+        {
+          name: 'upload'
+          storageName: 'upload'
+          storageType: 'AzureFile'
         }
       ]
       scale: {
