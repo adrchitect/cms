@@ -1,0 +1,35 @@
+{
+  "collectionName": "components_ui_heroes",
+  "info": {
+    "displayName": "Hero",
+    "icon": "landscape",
+    "description": ""
+  },
+  "options": {},
+  "attributes": {
+    "title": {
+      "type": "string",
+      "required": true
+    },
+    "description": {
+      "type": "text",
+      "required": true
+    },
+    "CTO": {
+      "type": "component",
+      "repeatable": false,
+      "component": "elements.button"
+    },
+    "link": {
+      "type": "component",
+      "repeatable": false,
+      "component": "elements.button"
+    },
+    "images": {
+      "type": "media",
+      "multiple": true,
+      "required": true,
+      "allowedTypes": ["images"]
+    }
+  }
+}
