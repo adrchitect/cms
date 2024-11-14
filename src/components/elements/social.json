@@ -1,0 +1,23 @@
+{
+  "collectionName": "components_elements_socials",
+  "info": {
+    "displayName": "Social",
+    "icon": "heart"
+  },
+  "options": {},
+  "attributes": {
+    "title": {
+      "type": "string",
+      "required": true
+    },
+    "isEnabled": {
+      "type": "boolean",
+      "default": false,
+      "required": true
+    },
+    "link": {
+      "type": "string",
+      "required": true
+    }
+  }
+}

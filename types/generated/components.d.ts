@@ -28,6 +28,21 @@ export interface ElementsListItemWithIcon extends Struct.ComponentSchema {
   };
 }
 
+export interface ElementsSocial extends Struct.ComponentSchema {
+  collectionName: 'components_elements_socials';
+  info: {
+    displayName: 'Social';
+    icon: 'heart';
+  };
+  attributes: {
+    isEnabled: Schema.Attribute.Boolean &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<false>;
+    link: Schema.Attribute.String & Schema.Attribute.Required;
+    title: Schema.Attribute.String & Schema.Attribute.Required;
+  };
+}
+
 export interface UiHero extends Struct.ComponentSchema {
   collectionName: 'components_ui_heroes';
   info: {
@@ -71,6 +86,7 @@ declare module '@strapi/strapi' {
     export interface ComponentSchemas {
       'elements.button': ElementsButton;
       'elements.list-item-with-icon': ElementsListItemWithIcon;
+      'elements.social': ElementsSocial;
       'ui.hero': UiHero;
       'ui.kernwaarden': UiKernwaarden;
     }
