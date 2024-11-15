@@ -59,6 +59,16 @@ jobs:
           parameters: environment=preview
           failOnStdErr: false
 
+      - name: Deploy database
+        uses: azure/arm-deploy@v2
+        with:
+          scope: subscription
+          region: germanywestcentral
+          subscriptionId: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          template: ./deploy/database.bicep
+          parameters: environment=preview
+          failOnStdErr: false
+
       - name: Deploy cms
         id: deployCms
         uses: azure/arm-deploy@v2
@@ -66,7 +76,7 @@ jobs:
           scope: subscription
           region: westeurope
           subscriptionId: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-          template: ./deploy/pr.bicep
+          template: ./deploy/main.bicep
           parameters: environment=preview imageTag=${{ env.GITHUB_REF_NAME_SLUG }}
           failOnStdErr: false
 
@@ -111,4 +121,3 @@ jobs:
           azcliversion: latest
           inlineScript: |
             az containerapp delete -g rg-xprtzbv-cms -n ctap-xprtzbv-cms-${{ env.GITHUB_REF_NAME_SLUG }} -y
-            az containerapp delete -g rg-xprtzbv-cms -n psql-xprtzbv-cms-${{ env.GITHUB_REF_NAME_SLUG }} -y

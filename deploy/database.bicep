@@ -19,7 +19,7 @@ resource keyVaultRef 'Microsoft.KeyVault/vaults@2022-07-01' existing = {
   scope: resourceGroup
 }
 
-module postgresServer 'modules/postgresql.bicep' = if (environment == 'production') {
+module postgresServer 'modules/postgresql.bicep' = {
   name: 'Deploy-Postgresql'
   scope: resourceGroup
   params: {

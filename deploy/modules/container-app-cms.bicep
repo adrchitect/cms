@@ -2,6 +2,7 @@ param location string
 param keyVaultName string
 param containerAppUserAssignedIdentityResourceId string
 param containerAppUserAssignedIdentityClientId string
+param databaseServerName string
 param imageTag string = 'latest'
 param deployTime int = dateTimeToEpoch(dateTimeAdd(utcNow(), 'P1Y'))
 param app string = 'cms'
@@ -9,11 +10,13 @@ param environment string = 'preview'
 
 var environmentShort = environment == 'preview' ? 'prv' : 'prd'
 var name = take('ctap-xprtzbv-cms-${imageTag}', 32)
-var dbName = take('psql-xprtzbv-cms-${imageTag}', 32)
 var acrServer = 'xprtzbv.azurecr.io'
 var imageName = '${acrServer}/cms:${imageTag}'
+var initImageName = '${acrServer}/cms/init:latest'
+var administratorLogin = 'cmsadmin'
 var deployTimeInSecondsSinceEpoch = string(deployTime)
 var storageAccountName = take('stxprtzbv${app}${environmentShort}${uniqueString(az.resourceGroup().id)}', 24)
+
 
 resource keyVault 'Microsoft.KeyVault/vaults@2022-07-01' existing = {
   name: keyVaultName
@@ -25,6 +28,10 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2023-05-01' existing 
 
 resource containerAppEnvironment 'Microsoft.App/managedEnvironments@2022-11-01-preview' existing = {
   name: 'me-xprtzbv-cms'
+}
+
+resource postgres 'Microsoft.DBforPostgreSQL/flexibleServers@2023-12-01-preview' existing = {
+  name: databaseServerName
 }
 
 resource fileServices 'Microsoft.Storage/storageAccounts/fileServices@2023-05-01' = {
@@ -45,19 +52,6 @@ resource uploadFileShare 'Microsoft.Storage/storageAccounts/fileServices/shares@
     accessTier: 'Hot'
     enabledProtocols: 'SMB'
     shareQuota: 102400
-  }
-}
-
-resource postgres 'Microsoft.App/containerApps@2023-04-01-preview' = {
-  name: dbName
-  location: location
-  properties: {
-    environmentId: containerAppEnvironment.id
-    configuration: {
-      service: {
-        type: 'postgres'
-      }
-    }
   }
 }
 
@@ -110,6 +104,16 @@ resource containerApp 'Microsoft.App/containerApps@2023-08-01-preview' = {
           identity: containerAppUserAssignedIdentityResourceId
         }
         {
+          name: toLower('POSTGRES-ADMIN-PASSWORD')
+          keyVaultUrl: toLower('${keyVault.properties.vaultUri}secrets/POSTGRES-ADMIN-PASSWORD')
+          identity: containerAppUserAssignedIdentityResourceId
+        }
+        {
+          name: toLower('POSTGRES-STRAPI-PASSWORD')
+          keyVaultUrl: toLower('${keyVault.properties.vaultUri}secrets/POSTGRES-STRAPI-PASSWORD')
+          identity: containerAppUserAssignedIdentityResourceId
+        }
+        {
           name: toLower('REF-AZURE-ACS-ENDPOINT')
           keyVaultUrl: toLower('${keyVault.properties.vaultUri}secrets/AZURE-ACS-ENDPOINT')
           identity: containerAppUserAssignedIdentityResourceId
@@ -122,11 +126,6 @@ resource containerApp 'Microsoft.App/containerApps@2023-08-01-preview' = {
       ]
     }
     template: {
-      serviceBinds: [
-        {
-          serviceId: postgres.id
-        }
-      ]
       containers: [
         {
           name: name
@@ -173,6 +172,34 @@ resource containerApp 'Microsoft.App/containerApps@2023-08-01-preview' = {
               secretRef: toLower('REF-JWT-SECRET')
             }
             {
+              name: 'DATABASE_HOST'
+              value: postgres.properties.fullyQualifiedDomainName
+            }
+            {
+              name: 'DATABASE_PORT'
+              value: '5432'
+            }
+            {
+              name: 'DATABASE_SSL'
+              value: 'true'
+            }
+            {
+              name: 'DATABASE_SCHEMA'
+              value: 'strapi'
+            }
+            {
+              name: 'DATABASE_USERNAME'
+              value: 'strapi'
+            }
+            {
+              name: 'DATABASE_NAME'
+              value: 'strapi'
+            }
+            {
+              name: 'DATABASE_PASSWORD'
+              secretRef: toLower('POSTGRES-STRAPI-PASSWORD')
+            }
+            {
               name: 'AZURE_ENDPOINT'
               secretRef: toLower('REF-AZURE-ACS-ENDPOINT')
             }
@@ -213,6 +240,42 @@ resource containerApp 'Microsoft.App/containerApps@2023-08-01-preview' = {
           ]
         }
       ]
+      initContainers: [
+        {
+          name: 'database-init'
+          image: initImageName
+          resources: {
+            cpu: json('0.25')
+            memory: '0.5Gi'
+          }
+          env: [
+            {
+              name: 'ADMINPASSWORD'
+              secretRef: toLower('POSTGRES-ADMIN-PASSWORD')
+            }
+            {
+              name: 'STRAPIPASSWORD'
+              secretRef: toLower('POSTGRES-STRAPI-PASSWORD')
+            }
+            {
+              name: 'ADMINUSER'
+              value: administratorLogin
+            }
+            {
+              name: 'SERVER'
+              value: postgres.properties.fullyQualifiedDomainName
+            }
+            {
+              name: 'STRAPIUSER'
+              value: 'strapi'
+            }
+            {
+              name: 'STRAPIDATABASENAME'
+              value: 'strapi'
+            }
+          ]
+        }
+      ]
       volumes: [
         {
           name: 'upload'
@@ -221,7 +284,7 @@ resource containerApp 'Microsoft.App/containerApps@2023-08-01-preview' = {
         }
       ]
       scale: {
-        minReplicas: 0
+        minReplicas: 1
         maxReplicas: 1
       }
     }

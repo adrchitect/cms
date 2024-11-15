@@ -44,9 +44,9 @@ module storage 'modules/storageaccount.bicep' = {
   }
 }
 
-module containerAppCmsProd 'modules/container-app-cms-prod.bicep' = {
+module containerAppCms 'modules/container-app-cms.bicep' = {
   scope: resourceGroup
-  name: 'Deploy-Container-App-Cms-Prod'
+  name: 'Deploy-Container-App-Cms'
   params: {
     location: location
     keyVaultName: keyVaultName
@@ -63,7 +63,7 @@ module frontdoorSettings 'modules/frontdoor.bicep' = {
   scope: infrastructureResourceGroup
   name: 'Deploy-Frontdoor-Settings'
   params: {
-    frontDoorOriginHost: containerAppCmsProd.outputs.containerAppUrl
+    frontDoorOriginHost: containerAppCms.outputs.containerAppUrl
     frontDoorProfileName: frontDoorProfileName
     application: app
     rootDomain: rootDomain
@@ -81,3 +81,5 @@ module dns 'modules/dns.bicep' = {
     validationToken: frontdoorSettings.outputs.frontDoorCustomDomainValidationToken
   }
 }
+
+output cmsFqdn string = containerAppCms.outputs.containerAppUrl
