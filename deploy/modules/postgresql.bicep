@@ -16,7 +16,7 @@ resource postgreSql 'Microsoft.DBforPostgreSQL/flexibleServers@2023-12-01-previe
     administratorLoginPassword: administratorLoginPassword
     createMode: 'Default'
     replicationRole: 'Primary'
-    version: '16'
+    version: '14'
     storage: {
       storageSizeGB: 32
       type: 'PremiumV2_LRS'
