@@ -7,6 +7,8 @@ param imageTag string = 'latest'
 var sharedValues = json(loadTextContent('shared-values.json'))
 var builtinRoles = json(loadTextContent('builtin-roles.json'))
 var environmentShort = environment == 'preview' ? 'prv' : 'prd'
+var subDomain = environment == 'preview' ? 'cms-preview' : 'cms'
+var app = environment == 'preview' ? 'cms-preview' : 'cms'
 var defaultName = 'xprtzbv-cms'
 var resourceGroupName = 'rg-${defaultName}'
 var containerAppIdentityName = 'id-${defaultName}'
@@ -22,7 +24,6 @@ var infrastructureResourceGroup = az.resourceGroup(
 )
 var rootDomain = 'xprtz.dev'
 var frontDoorProfileName = 'afd-xprtzbv-websites'
-var app = 'cms'
 
 resource resourceGroup 'Microsoft.Resources/resourceGroups@2021-04-01' existing = {
   name: resourceGroupName
@@ -55,7 +56,7 @@ module containerAppCms 'modules/container-app-cms.bicep' = {
     databaseServerName: databaseServerName
     imageTag: imageTag
     environment: environment
-    app: app
+    app: 'cms'
   }
 }
 
@@ -67,7 +68,7 @@ module frontdoorSettings 'modules/frontdoor.bicep' = {
     frontDoorProfileName: frontDoorProfileName
     application: app
     rootDomain: rootDomain
-    subDomain: 'cms'
+    subDomain: subDomain
   }
 }
 
@@ -77,7 +78,7 @@ module dns 'modules/dns.bicep' = {
   params: {
     origin: frontdoorSettings.outputs.frontDoorCustomDomainHost
     rootDomain: rootDomain
-    subDomain: 'cms'
+    subDomain: subDomain
     validationToken: frontdoorSettings.outputs.frontDoorCustomDomainValidationToken
   }
 }

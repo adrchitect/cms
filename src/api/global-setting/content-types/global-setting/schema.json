@@ -28,10 +28,7 @@
         }
       },
       "type": "enumeration",
-      "enum": [
-        "cloud",
-        "dotnet"
-      ],
+      "enum": ["cloud", "dotnet"],
       "default": "dotnet",
       "required": true
     },

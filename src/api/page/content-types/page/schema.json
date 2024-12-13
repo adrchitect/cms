@@ -36,10 +36,7 @@
     },
     "components": {
       "type": "dynamiczone",
-      "components": [
-        "ui.hero",
-        "ui.kernwaarden"
-      ],
+      "components": ["ui.hero", "ui.kernwaarden"],
       "pluginOptions": {
         "i18n": {
           "localized": true
@@ -48,10 +45,7 @@
     },
     "site": {
       "type": "enumeration",
-      "enum": [
-        "cloud",
-        "dotnet"
-      ],
+      "enum": ["cloud", "dotnet"],
       "required": true,
       "default": "dotnet",
       "pluginOptions": {
