@@ -40,9 +40,7 @@
         }
       },
       "type": "dynamiczone",
-      "components": [
-        "ui.hero"
-      ],
+      "components": ["ui.hero"],
       "required": true,
       "min": 1
     },
@@ -53,10 +51,7 @@
         }
       },
       "type": "enumeration",
-      "enum": [
-        "cloud",
-        "dotnet"
-      ],
+      "enum": ["cloud", "dotnet"],
       "required": true,
       "default": "dotnet"
     }
