@@ -172,6 +172,10 @@ resource containerApp 'Microsoft.App/containerApps@2023-08-01-preview' = {
               secretRef: toLower('REF-JWT-SECRET')
             }
             {
+              name: 'DATABASE_CLIENT'
+              value: 'postgres'
+            }
+            {
               name: 'DATABASE_HOST'
               value: postgres.properties.fullyQualifiedDomainName
             }
