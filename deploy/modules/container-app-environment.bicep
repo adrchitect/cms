@@ -20,6 +20,12 @@ resource containerAppEnvironment 'Microsoft.App/managedEnvironments@2024-03-01' 
         sharedKey: logAnalyticsWorkspace.listKeys().primarySharedKey
       }
     }
+    workloadProfiles: [
+      {
+        name: 'Consumption'
+        workloadProfileType: 'consumption'
+      }
+    ]
   }
 }
 
