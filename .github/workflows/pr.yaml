@@ -10,20 +10,13 @@ permissions:
   id-token: write
   contents: read
   pull-requests: write
+  packages: write
 jobs:
   ci:
     runs-on: ubuntu-latest
-    environment: preview
     name: CI
     if: github.event.action != 'closed'
     steps:
-      - name: Azure login
-        uses: azure/login@v2
-        with:
-          client-id: ${{ secrets.AZURE_CLIENT_ID }}
-          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
-          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-
       - name: Inject slug/short variables
         uses: rlespinasse/github-slug-action@v4
         with:
@@ -33,91 +26,19 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: 'Login to ACR'
-        run: |
-          set -euo pipefail
-          access_token=$(az account get-access-token --query accessToken -o tsv)
-          refresh_token=$(curl https://${{ secrets.REGISTRY_NAME }}.azurecr.io/oauth2/exchange -v -d "grant_type=access_token&service=${{ secrets.REGISTRY_NAME }}.azurecr.io&access_token=$access_token" | jq -r .refresh_token)
-          docker login -u 00000000-0000-0000-0000-000000000000 --password-stdin ${{ secrets.REGISTRY_NAME }}.azurecr.io <<< "$refresh_token"
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build and push container image
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v6
         with:
           push: true
-          tags: ${{ secrets.REGISTRY_NAME }}.azurecr.io/cms:${{ env.GITHUB_REF_NAME_SLUG }}
+          tags: ghcr.io/${{ github.repository }}/cms:${{ env.GITHUB_REF_NAME_SLUG }}
           file: ./Dockerfile.prod
           build-args: |
             NODE_ENV=production
 
-      - name: Deploy infrastructure
-        uses: azure/arm-deploy@v2
-        with:
-          scope: subscription
-          region: westeurope
-          subscriptionId: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-          template: ./deploy/infrastructure.bicep
-          parameters: environment=preview
-          failOnStdErr: false
-
-      - name: Deploy database
-        uses: azure/arm-deploy@v2
-        with:
-          scope: subscription
-          region: germanywestcentral
-          subscriptionId: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-          template: ./deploy/database.bicep
-          parameters: environment=preview
-          failOnStdErr: false
-
-      - name: Deploy cms
-        id: deployCms
-        uses: azure/arm-deploy@v2
-        with:
-          scope: subscription
-          region: westeurope
-          subscriptionId: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-          template: ./deploy/main.bicep
-          parameters: environment=preview imageTag=${{ env.GITHUB_REF_NAME_SLUG }}
-          failOnStdErr: false
-
-      - name: Comment CMS FQDN on Pull Requests
-        uses: actions/github-script@v7
-        if: github.event_name == 'pull_request'
-        with:
-          script: |
-            github.rest.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              body: `# Preview environment URL
-
-              ## Strapi
-
-              [URL](https://${{ steps.deployCms.outputs.cmsFqdn }})
-              `
-            })
-
-  remove_webapp:
-    runs-on: ubuntu-latest
-    environment: preview
-    name: Remove webapp
-    if: github.event.action == 'closed'
-    steps:
-      - name: Inject slug/short variables
-        uses: rlespinasse/github-slug-action@v4
-        with:
-          slug-maxlength: 11
-
-      - name: Azure login
-        uses: azure/login@v2
-        with:
-          client-id: ${{ secrets.AZURE_CLIENT_ID }}
-          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
-          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-
-      - name: Remove webapp
-        uses: azure/CLI@v2
-        with:
-          azcliversion: latest
-          inlineScript: |
-            az containerapp delete -g rg-xprtzbv-cms -n ctap-xprtzbv-cms-${{ env.GITHUB_REF_NAME_SLUG }} -y
