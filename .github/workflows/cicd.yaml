@@ -12,9 +12,9 @@ permissions:
   issues: write
   packages: write
 jobs:
-  ci:
+  build:
     runs-on: ubuntu-latest
-    name: CI/CD
+    name: Build
     steps:
       - uses: actions/checkout@main
         with:
